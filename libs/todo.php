@@ -180,7 +180,7 @@ class Todo {
                                     $event->children[count($event->children) - 1]->end = $step_time;
                                 }
                                 if ($type) {
-									if ($event->start && $step == $step_offset)
+									if ($event->start && $step == $start_offset)
 										$step_time = $event->start;
                                     if (empty($event->children))
                                         $event->children = array();
@@ -300,7 +300,7 @@ class Todo {
 		$file_path = $this->user->dir . '/todo.json';
 		if (file_exists($file_path)) {
 			$json = file_get_contents($file_path);
-			$this->data = json_decode(json);
+			$this->data = json_decode($json);
 			return $json;
 		}
 		return false;

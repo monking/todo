@@ -83,7 +83,7 @@ class BasicUser {
 		if (file_exists($this->settings_file)) {
 			$this->settings = json_decode(file_get_contents($this->settings_file));
 		} else {
-			$this->settings = (object) $options['user_default_settings'];
+			$this->settings = (object) $this->user_default_settings;
 			if (!file_exists($this->dir))
 				mkdir($this->dir);
 			file_put_contents($this->settings_file, json_encode($this->settings));
@@ -94,7 +94,7 @@ class BasicUser {
 		$this->credentials = json_decode(file_get_contents($this->credentials_path));
 		$this->signatures = array();
 		foreach ($this->credentials as $username => $credentials) {
-			if (!$credentials->sig) continue;
+			if (!isset($credentials->sig)) continue;
 			$this->signatures[$credentials->sig] = $username;
 		}
 	}
@@ -104,7 +104,7 @@ class BasicUser {
 	}
 
 	private function issueSignature() {
-		if (!$this->credentials->{$this->username}->sig) {
+		if (!isset($this->credentials->{$this->username}->sig)) {
 			$this->credentials->{$this->username}->sig = uniqid();
 			$this->saveCredentials();
 		}
