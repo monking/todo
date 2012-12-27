@@ -1,0 +1,253 @@
+@font-face {
+	font-family: 'Droid Sans Mono';
+	font-style: normal;
+	font-weight: 400;
+	/*src: local('Droid Sans Mono'), local('DroidSansMono'), url(http://themes.googleusercontent.com/static/fonts/droidsansmono/v4/ns-m2xQYezAtqh7ai59hJaH0X__W3S3MJL29bc5CWfs.woff) format('woff');*/
+	src: local('Monaco'), local('Deja Vu Sans Mono'), local('Lucida Console'), local('Droid Sans Mono'), local('DroidSansMono'), url(http://themes.googleusercontent.com/static/fonts/droidsansmono/v4/ns-m2xQYezAtqh7ai59hJaH0X__W3S3MJL29bc5CWfs.woff) format('woff');
+}
+body{margin:0;padding:20px 10px 120px 10px;background-color;#000}
+*{font-family:"Monaco","Deja Vu Sans Mono","Lucida Console","Droid Sans Mono",monospace;font-size:12px;line-height:1.5}
+/* *{;-webkit-text-size-adjust:none} /* TODO: fix text scaling on iPhone more specifically */
+.collapsed{position:relative}
+.collapsed .comment{position:absolute;top:0.2em;left:-1em;overflow:hidden;width:0.5em;height:1em;text-indent:-9999em;cursor:pointer;margin:0;padding:0}
+.tag{cursor:pointer}
+
+#schedule-container{margin:0 0 1em;position:relative;overflow-y:hidden;overflow-x:auto}
+#schedule{position:relative;padding:75px 0 8px;min-width:960px;background-size:480px;background-position:0px 50px;background-repeat:repeat-x}
+
+#tick{position:absolute;top:0;border-left:1px solid;height:100%;z-index:0}
+.event{position:relative;white-space:nowrap;height:1.5em;line-height:1.5em;padding:3px 0}
+.event .segment,.event .name{height:100%;width:auto;position:absolute;top:0}
+.event .segment{overflow:hidden}
+.segment,.remaining{background-position:right center;background-size:24px}
+.event .remaining{position:absolute;right:0;height:100%}
+.event .name{padding-left:0.5em}
+
+.task{margin-left:2em;padding-left:2em;text-indent:-2em}
+.comment{text-indent:0;margin:0.5em 0}
+
+.button{text-decoration:none;padding:1em 0.3em;margin:0 0.2em;border-radius:0.5em;font-size:140%;cursor:pointer;border:3px solid;text-align:center}
+.disabled{opacity:0.3}
+
+.footer{width:100%;text-align:center;position:fixed;left:0;bottom:0;width:100%;height:70px;line-height:70px}
+.footer .button{display:inline-block;vertical-align:middle}
+
+.current-time{background-color:inherit;font-size:250%;padding:0 0.5em;display:block;line-height:45px}
+
+#menu-container{display:none;position:fixed;width:60%;height:100%;left:15%;top:0;overflow:auto;padding:5%}
+#menu-container,
+.menu,
+#calendar-wrap,
+#inbox{display:none}
+.menu{padding-bottom:90px}
+#menu-container.open,
+.menu.open,
+#calendar-wrap.open,
+#inbox.open{display:block}
+.menu .button{margin:1em auto;width:50%}
+
+#calendar-wrap{width:100%;max-width:60em;margin:1em auto}
+#calendar{position:relative;width:100%;border-spacing:0;border-collapse:collapse}
+#calendar thead{text-align:center}
+#calendar td{font-size:80%}
+#calendar td div{font-size:inherit}
+#calendar tbody td{font-size:7px;width:14%;height:5em;border-width:0;border-top-width:1px;border-left-width:1px;border-style:solid;margin:0;vertical-align:top}
+#calendar tbody td:first-child{border-left-width:0}
+#calendar .date{float:right;font-size:150%;padding:0.1em}
+
+::-webkit-scrollbar			  {display:none}
+::-webkit-scrollbar-button	   {display:none}
+::-webkit-scrollbar-track		{display:none}
+::-webkit-scrollbar-track-piece  {display:none}
+::-webkit-scrollbar-thumb		{display:none}
+::-webkit-scrollbar-corner	   {display:none}
+::-webkit-resizer				{display:none}
+
+.sample-dark{color:#F00}
+.sample-light{color:#F00}
+.sample-black{color:#F00}
+.sample-night{color:#F00}
+
+/* --- dark color scheme { --- */
+body.dark{background-color:#222;color:#FFF}
+.dark a{color:#F9F}
+.dark .project{color:#CBA}
+.dark .comment{background-color:#345;color:#CCC}
+.dark .collapsed .comment{background-color:#468}
+.dark .tag{color:#CA7}
+.dark .tag.highlight{background-color:#FD9;color:#000;outline:2px solid #FD9}
+
+.dark #schedule{background-image:url(images/schedule-bg-ffffff.png)}
+.dark .busy{background-color:rgba(255,255,255,0.3);box-shadow:inset 2px 0 0 #FFF}
+.dark .event.now{background-color:transparent}
+.dark .now .busy{background-image:url(images/tx-now-ffffff.png);background-color:transparent}
+.dark .busy .remaining{background-image:url(images/tx-now-invert-000000.png);background-color:#3DF}
+.dark .maybe{box-shadow:inset 0 0 8px #999}
+.dark .to{background-image:url(images/tx-to-ffffff.png)}
+.dark .to .remaining{background-image:url(images/tx-to-invert-000000.png);background-color:#3DF}
+.dark .now .name{background-color:#000}
+.dark .task{color:#AAA}
+.dark .next{color:#FFF}
+.dark .now,
+.dark #schedule .active{background-color:#000;color:#3DF}
+.dark .paused{color:#9BA}
+.dark .done{color:#397}
+.dark .hold{color:#666}
+.dark .maybe{color:#97B}
+.dark .note{color:#EAA}
+.dark .canceled{color:#666;text-decoration:line-through}
+.dark #tick{color:#0CF;border-color:#0CF}
+.dark .current-time{background-color:#000}
+.dark .success{background-color:#2C6 !important;color:#FFF !important}
+.dark .footer{background-color:rgba(20,20,20,0.5)}
+
+.dark .button{color:#999;background-color:#111;border-color:#000}
+
+.dark #menu-container{background-color:rgba(0,0,0,0.7)}
+
+.dark #calendar td{border-color:#444}
+.dark #calendar .date{color:#999}
+.dark #calendar .active{border:1px solid #CCC}
+.dark #calendar .active-month{background-color:#000}
+.dark #calendar .today{background-color:#036}
+
+.dark ::-webkit-scrollbar{display:block}
+.dark ::-webkit-scrollbar-track{display:block;background-color:#444}
+.dark ::-webkit-scrollbar-thumb{display:block;background-color:#666}
+/* --- } dark color scheme --- */
+
+/* --- light color scheme { --- */
+body.light{background-color:#EEE;color:#222}
+.light a{text-decoration:underline}
+.light .project{}
+.light .comment{}
+.light .collapsed .comment{outline: 1ps solid #000}
+.light .tag{color:#C60}
+.light .tag.highlight{background-color:#FD9;color:#000;outline:2px solid #FD9}
+
+.light #schedule{background-image:url(images/schedule-bg-000000.png)}
+.light .busy{background-color:rgba(0,0,0,0.2);box-shadow:inset 2px 0 0 #000}
+.light .event.now{background-color:transparent}
+.light .now .busy{background-image:url(images/tx-now-000000.png);background-color:transparent}
+.light .busy .remaining{background-image:url(images/tx-now-invert-ffffff.png);background-color:#09E}
+.light .maybe{box-shadow:inset 0 0 8px #999}
+.light .to{background-image:url(images/tx-to-000000.png)}
+.light .to .remaining{background-image:url(images/tx-to-invert-ffffff.png);background-color:#09E}
+.light .now .name{background-color:#FFF}
+.light .task{color:#666}
+.light .next{color:#000}
+.light .name{background-color:rgba(239,239,239,0.7)}
+.light .now,
+.light .active{background-color:#FFF;color:#09E}
+.light .paused{color:#9BA}
+.light .done{color:#397}
+.light .hold{color:#666}
+.light .maybe{color:#97B}
+.light .note{color:#EAA}
+.light .canceled{color:#666;text-decoration:line-through}
+.light #tick{color:#09E;border-color:#09E}
+.light .current-time{background-color:#FFF}
+.light .success{background-color:#2C6 !important;color:#000 !important}
+.light .footer{background-color:rgba(255,255,255,0.5)}
+
+.light .button{color:#000;background-color:#CCC;border-color:#FFF}
+
+.light #menu-container{background-color:rgba(255,255,255,0.7)};
+
+.light #calendar tbody td{border-color:#CCC}
+.light #calendar .today{background-color:#9CF}
+
+.light ::-webkit-scrollbar{display:block}
+.light ::-webkit-scrollbar-track{display:block;background-color:#EEE}
+.light ::-webkit-scrollbar-thumb{display:block;background-color:#CCC}
+/* --- } light color scheme --- */
+
+/* --- black color scheme { --- */
+body.black{background-color:#000;color:#FFF}
+.black a{color:#F9F}
+.black .project{color:#CBA}
+.black .comment{background-color:#345;color:#CCC}
+.black .collapsed .comment{background-color:#468}
+.black .tag{color:#CA7}
+.black .tag.highlight{background-color:#FD9;color:#000;outline:2px solid #FD9}
+
+.black #schedule{background-image:url(images/schedule-bg-ffffff.png)}
+.black .busy{background-color:rgba(255,255,255,0.3);box-shadow:inset 2px 0 0 #FFF}
+.black .event.now{background-color:transparent}
+.black .now .busy{background-image:url(images/tx-now-ffffff.png);background-color:transparent}
+.black .busy .remaining{background-image:url(images/tx-now-invert-000000.png);background-color:#3DF}
+.black .maybe{box-shadow:inset 0 0 8px #999}
+.black .to{background-image:url(images/tx-to-ffffff.png)}
+.black .to .remaining{background-image:url(images/tx-to-invert-000000.png);background-color:#3DF}
+.black .now .name{background-color:#000}
+.black .task{color:#AAA}
+.black .next{color:#FFF}
+.black .now,
+.black .active{background-color:#000;color:#3DF}
+.black .paused{color:#9BA}
+.black .done{color:#397}
+.black .hold{color:#666}
+.black .maybe{color:#97B}
+.black .note{color:#EAA}
+.black .canceled{color:#666;text-decoration:line-through}
+.black #tick{color:#0CF;border-color:#0CF}
+.black .current-time{background-color:#000}
+.black .success{background-color:#2C6 !important;color:#FFF !important}
+.black .footer{background-color:rgba(0,0,0,0.6)}
+
+.black .button{color:#999;background-color:#000;border-color:#111}
+
+.black #menu-container{background-color:rgba(0,0,0,0.7)};
+
+.black #calendar tbody td{border-color:#333}
+.black #calendar .today{background-color:#036}
+
+.black ::-webkit-scrollbar{display:block}
+.black ::-webkit-scrollbar-track{display:block;background-color:#222}
+.black ::-webkit-scrollbar-thumb{display:block;background-color:#444}
+/* --- } black color scheme --- */
+
+/* --- night color scheme { --- */
+body.night{background-color:#200;color:#C00}
+.night a{color:#F00}
+.night .project{color:#900}
+.night .comment{background-color:#300;color:#C00}
+.night .collapsed .comment{background-color:#900}
+.night .tag{color:#F00}
+.night .tag.highlight{background-color:#E00;color:#000;outline:2px solid #E00}
+
+.night #schedule{background-image:url(images/schedule-bg-ff0000.png)}
+.night .busy{background-color:rgba(255,0,0,0.3);box-shadow:inset 2px 0 0 #F00}
+.night .event.now{background-color:transparent}
+.night .now .busy{background-image:url(images/tx-now-ff0000.png);background-color:transparent}
+.night .busy .remaining{background-image:url(images/tx-now-invert-000000.png);background-color:#F00}
+.night .maybe{box-shadow:inset 0 0 8px #900}
+.night .to{background-image:url(images/tx-to-ff0000.png)}
+.night .to .remaining{background-image:url(images/tx-to-invert-000000.png);background-color:#F00}
+.night .now .name{background-color:#000}
+.night .task{color:#A00}
+.night .next{color:#F00}
+.night .now,
+.night .active{background-color:#000;color:#F00}
+.night .paused{color:#C00}
+.night .done{color:#900;background-color:#300}
+.night .hold{color:#600}
+.night .maybe{color:#A00}
+.night .note{color:#A00}
+.night .canceled{color:#600;text-decoration:line-through;background-color:#300}
+.night #tick{color:#F00;border-color:#F00}
+.night .current-time{background-color:#000}
+.night .success{background-color:#F00 !important;color:#000 !important}
+.night .footer{background-color:rgba(0,0,0,0.6)}
+
+.night .button{color:#C00;background-color:#000;border-color:#200}
+
+.night #menu-container{background-color:rgba(0,0,0,0.7)};
+
+.night #calendar tbody td{border-color:#400}
+.night #calendar .today{background-color:#300}
+
+.night ::-webkit-scrollbar{display:block}
+.night ::-webkit-scrollbar-track{display:block;background-color:#200}
+.night ::-webkit-scrollbar-thumb{display:block;background-color:#600}
+/* --- } night color scheme --- */
