@@ -3,9 +3,9 @@ $params = explode('/', preg_replace('@^/@', '', $_SERVER['REQUEST_URI']));
 require_once('../config.php');
 ?>
 <!DOCTYPE html>
-<html manifest="tent.manifest">
+<html manifest="appcache.manifest">
 	<head>
-		<title>tent</title>
+		<title>TODO</title>
 
 		<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
 		<meta name="apple-mobile-web-app-capable" content="yes" />
