@@ -1,9 +1,3 @@
-AuthName "Your Tent"
-AuthType Basic
-AuthUserFile /www/users
-AuthGroupFile /www/groups
-Require group tent
-
 AddType 'text/cache-manifest; charset=UTF-8' .manifest
 
 # Disable Caching *.json.php, except as offline app
