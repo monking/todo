@@ -91,9 +91,12 @@ var TodoController = function() {};
 TodoController.prototype = {
 	init: function() {
 		var $this = this;
-		this.setupUI();
-		this.setupKeyboardShortcuts();
-		this.fetchData();
+		this.state = {};
+		if (!this.restoreState()) {
+			this.setupUI();
+			this.setupKeyboardShortcuts();
+			this.fetchData();
+		}
 	},
 	add: function(parent, data) {
 		if (! parent.hasOwnProperty('contains') || ! types.hasOwnProperty(parent.contains)) return;
@@ -134,6 +137,31 @@ TodoController.prototype = {
 		item.extends(options.changes, true);
 		console.log(item);
 		// mark edited item for next sync
+	},
+	saveState: function() {
+		if (window.localStorage) {
+			window.localStorage.state = JSON.stringify(this.state);
+			window.localStorage.indexedData = JSON.stringify(this.data);
+			window.localStorage.bodyState = document.getElementsByTagName("body")[0].innerHTML;
+		}
+	},
+	restoreState: function() {
+		if (window.localStorage
+		&& window.localStorage.state
+		&& window.localStorage.indexedData
+		&& window.localStorage.bodyState) {
+			this.data = JSON.parse(window.localStorage.indexedData);
+			document.getElementsByTagName("body")[0].innerHTML = window.localStorage.bodyState;
+			this.state = JSON.parse(window.localStorage.state);
+			this.setupUI();
+			this.ui.tick.element = document.getElementById('tick');
+			this.connectCalendarUI();
+			this.setupTags();
+			this.setupComments();
+			this.tick();
+			return true;
+		}
+		return false;
 	},
 	setupUI: function() {
 		var $this = this;
@@ -211,6 +239,10 @@ TodoController.prototype = {
 			if (/\bdisabled\b/.test(this.className)) return;
 			$this.inboxPrompt();
 		};
+
+		// Schedule
+		if (this.state.scheduleScroll)
+			this.ui.scheduleContainer.element.scrollLeft = this.state.scheduleScroll;
 	},
 	setupKeyboardShortcuts: function() {
 		var $this = this;
@@ -425,6 +457,7 @@ TodoController.prototype = {
 		activeDate.setMinutes(0);
 		activeDate.setSeconds(0);
 		activeDate.setMilliseconds(0);
+		this.state.activeDate = activeDate.getTime();
 
 		var startDate = new Date(activeDate.getTime());
 		startDate.setDate(1); // start on first of the month
@@ -547,22 +580,21 @@ TodoController.prototype = {
 		return markup;
 	},
 	draw: function() {
-		var $this = this, today, tomorrow, scheduleMarkup, scheduleScroll, tasksMarkup;
-
+		var $this = this, today, tomorrow, scheduleMarkup, tasksMarkup;
 		today = this.data.children[0].children[0].children[0];
 		tomorrow = this.data.children[0].children[1].children[0];
 
 		this.ui.todayTitle.element.innerHTML = today.name;
 
 		// Schedule
-		scheduleScroll = this.ui.scheduleContainer.element.scrollLeft;
+		this.state.scheduleScroll = this.ui.scheduleContainer.element.scrollLeft;
 		scheduleMarkup = '';
 		scheduleMarkup += '<div id="tick"></div>';
 		scheduleMarkup += this.markupSchedule(today);
 		scheduleMarkup += this.markupSchedule(tomorrow, today.time);
 		this.ui.schedule.element.innerHTML = scheduleMarkup;
 		this.ui.tick.element = document.getElementById('tick');
-		this.ui.scheduleContainer.element.scrollLeft = scheduleScroll;
+		this.ui.scheduleContainer.element.scrollLeft = this.state.scheduleScroll;
 
 		// Calendar
 		this.ui.calendarBody.element.innerHTML = this.markupCalendar(new Date(today.time * 1000));
@@ -577,6 +609,7 @@ TodoController.prototype = {
 		this.setupTags();
 		this.setupComments();
 		this.tick();
+		this.saveState();
 	},
 	update: function() {
 		this.checkRollover();
@@ -608,7 +641,7 @@ TodoController.prototype = {
 		};
 		for (var i = 0; i < $tags.length; i++) {
 			$tags[i].onclick = function() {
-				highlightTags(toggleClass(this, 'highlight') ? this.className.replace(/\b(tag|highlight| +)/g, '') : false);
+				highlightTags(toggleClass(this, 'highlight') ? this.className.replace(/\b(tag|highlight| +)\b/g, '') : false);
 			};
 		}
 	},
@@ -772,7 +805,8 @@ TodoController.prototype = {
 		this.interval = null;
 	},
 	markupTags: function(string) {
-		string = string.replace(/\b([#@]([a-zA-Z][a-zA-Z0-9_]+))/g, '<span class="tag $2">$1</span>');
+		// string = string.replace(/\b([#@]([a-zA-Z][a-zA-Z0-9_]+))/g, '<span class="tag $2">$1</span>');
+		string = string.replace(/([#@]([a-zA-Z][a-zA-Z0-9_]+))/g, '<span class="tag $2">$1</span>');
 		string = string.replace(/(https?:\/\/[^\s]*)/g, '<a href="$1">$1</a>');
 		return string;
 	},
