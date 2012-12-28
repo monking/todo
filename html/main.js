@@ -142,27 +142,32 @@ TodoController.prototype = {
 		console.log(item);
 		// mark edited item for next sync
 	},
-	saveState: function() {
+	saveState: function(withDataAndMarkup) {
 		if (window.localStorage) {
 			window.localStorage.state = JSON.stringify(this.state);
-			window.localStorage.indexedData = JSON.stringify(this.data);
-			window.localStorage.bodyState = document.getElementsByTagName('body')[0].innerHTML;
+			if (withDataAndMarkup) {
+				window.localStorage.indexedData = JSON.stringify(this.data);
+				window.localStorage.bodyState = document.getElementsByTagName('body')[0].innerHTML;
+			}
 		}
 	},
 	restoreState: function() {
 		if (window.localStorage
-		&& window.localStorage.state
-		&& window.localStorage.indexedData
-		&& window.localStorage.bodyState) {
-			this.data = JSON.parse(window.localStorage.indexedData);
-			document.getElementsByTagName('body')[0].innerHTML = window.localStorage.bodyState;
+		&& window.localStorage.state ) {
 			this.state = JSON.parse(window.localStorage.state);
-			this.setupUI();
-			this.ui.tick.element = document.getElementById('tick');
-			this.connectCalendarUI();
-			this.setupTags();
-			this.setupComments();
-			this.tick();
+			if (window.localStorage.indexedData
+			&& window.localStorage.bodyState) {
+				this.data = JSON.parse(window.localStorage.indexedData);
+				document.getElementsByTagName('body')[0].innerHTML = window.localStorage.bodyState;
+				this.setupUI();
+				this.ui.tick.element = document.getElementById('tick');
+				this.connectCalendarUI();
+				this.setupTags();
+				this.setupComments();
+				this.tick();
+			} else {
+				this.fetchData();
+			}
 			return true;
 		}
 		return false;
@@ -288,8 +293,9 @@ TodoController.prototype = {
 		var setFetched = function(name) {
 			fetched[name] = true;
 			for (key in fetched) {
-				if (! fetched[key]) return
+				if (!fetched[key]) return;
 			}
+			if (!$this.data) return;
 			$this.draw();
 			if (typeof options.callback === 'function') {
 				options.callback();
@@ -298,10 +304,12 @@ TodoController.prototype = {
 
 		// fetch todo data
 		var parseTodo = function(json) {
+			if (!json) return;
 			if (window.localStorage) {
 				window.localStorage.todo = json;
 			}
 			var data = JSON.parse(json);
+			if (!data) return;
 			var i = 0;
 			var makeIndex = function(object) {
 				object.tmpKey = i++;
@@ -613,7 +621,7 @@ TodoController.prototype = {
 		this.setupTags();
 		this.setupComments();
 		this.tick();
-		this.saveState();
+		this.saveState(true);
 	},
 	update: function() {
 		this.checkRollover();
@@ -867,10 +875,15 @@ TodoController.prototype = {
 			return;
 
 		toggleClass(this.ui.updateButton.element, 'changed', true);
-		$this.state.changes.inbox.push(task);
+		$this.queueChange('inbox', task);
 		$this.data.children[3].children.push({name: task});
 		$this.draw();
 		$this.flushChanges();
+	},
+	queueChange: function(address, data) {
+		// so far only works for inbox
+		this.state.changes[address].push(data);
+		this.saveState();
 	},
 	flushChanges: function() {
 		// only inbox so far
@@ -886,6 +899,7 @@ TodoController.prototype = {
 			success: function(data) {
 				if (data == 'ok') {
 					$this.state.changes.inbox = [];
+					$this.saveState();
 					toggleClass(button, 'changed', true);
 					toggleClass(button, 'success', true);
 					setTimeout(function() {
