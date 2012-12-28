@@ -91,7 +91,11 @@ var TodoController = function() {};
 TodoController.prototype = {
 	init: function() {
 		var $this = this;
-		this.state = {};
+		this.state = {
+			changes: {
+				inbox: []
+			}
+		};
 		if (!this.restoreState()) {
 			this.setupUI();
 			this.setupKeyboardShortcuts();
@@ -201,14 +205,14 @@ TodoController.prototype = {
 			this.ui.updateMenu.options.push(option.attributes.name.value);
 			option.onclick = function() {
 				switch (this.attributes.name.value) {
-					case 'load':
+					case "load":
 						$this.fetchData({ disk:true });
-						$this.toggleMenu(false);
 						break;
-					case 'save':
-						$this.saveData();
+					case "save":
+						$this.flushChanges();
 						break;
 				}
+				$this.toggleMenu(false);
 			};
 		}
 
@@ -237,7 +241,7 @@ TodoController.prototype = {
 		};
 		this.ui.inboxButton.element.onclick = function() {
 			if (/\bdisabled\b/.test(this.className)) return;
-			$this.inboxPrompt();
+			$this.addToInbox();
 		};
 
 		// Schedule
@@ -247,7 +251,7 @@ TodoController.prototype = {
 	setupKeyboardShortcuts: function() {
 		var $this = this;
 		var responders = {
-			32:  /* SPACE */ "inboxPrompt",
+			32:  /* SPACE */ "addToInbox",
 			37:  /* LEFT  */ "reverseDay",
 			39:  /* RIGHT */ "advanceDay",
 			67:  /* c     */ "toggleCalendar",
@@ -851,29 +855,39 @@ TodoController.prototype = {
 	toggleInbox: function() {
 		toggleClass(this.ui.inbox.element, 'open');
 	},
-	inboxPrompt: function() {
+	addToInbox: function(task) {
+		if (this.lockChanges)
+			return;
 		var $this = this;
-		var button = this.ui.inboxButton.element;
-		var task = window.prompt('task for inbox');
-		if (!task) return;
 
-		toggleClass(button, 'disabled', true);
+		if (!task) {
+			task = window.prompt('task for inbox');
+		}
+
+		$this.state.changes.inbox.push(task);
+		$this.data.children[3].children.push({name: task});
+		$this.draw();
+		$this.flushChanges();
+	},
+	flushChanges: function() {
+		// only inbox so far
+		var $this = this,
+			button = this.ui.updateButton.element;
+		this.lockChanges = true;
 		getAjax({
 			method: 'POST',
-			url: 'inbox.php?task=' + encodeURIComponent(task),
+			url: "inbox.php?changes=" + encodeURIComponent(JSON.stringify(this.state.changes)),
 			complete: function() {
-				toggleClass(button, 'disabled', false);
+				$this.lockChanges = false;
 			},
 			success: function(data) {
 				if (data == 'ok') {
+					$this.changes.inbox = [];
 					toggleClass(button, 'success', true);
 					setTimeout(function() {
 						toggleClass(button, 'success', false);
 					}, 1000);
-					$this.data.children[3].children.push({name: task});
-					$this.draw();
 				} else {
-					alert(data);
 				}
 			}
 		});
