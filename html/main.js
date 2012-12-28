@@ -30,9 +30,9 @@ window.getAjax = function(options) {
 		}
 	}
 	if (options.method === 'POST' && options.data) {
-		request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-		request.setRequestHeader("Content-length", options.data.length);
-		request.setRequestHeader("Connection", "close");
+		request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+		request.setRequestHeader('Content-length', options.data.length);
+		request.setRequestHeader('Connection', 'close');
 		request.send(options.data);
 	} else {
 		request.send();
@@ -68,7 +68,7 @@ var toggleClass = function(element, className, override) {
 		classes.push(className);
 		added = true;
 	}
-	if (typeof added !== "undefined")
+	if (typeof added !== 'undefined')
 		element.className = classes.join(' ');
 	return added;
 };
@@ -146,7 +146,7 @@ TodoController.prototype = {
 		if (window.localStorage) {
 			window.localStorage.state = JSON.stringify(this.state);
 			window.localStorage.indexedData = JSON.stringify(this.data);
-			window.localStorage.bodyState = document.getElementsByTagName("body")[0].innerHTML;
+			window.localStorage.bodyState = document.getElementsByTagName('body')[0].innerHTML;
 		}
 	},
 	restoreState: function() {
@@ -155,7 +155,7 @@ TodoController.prototype = {
 		&& window.localStorage.indexedData
 		&& window.localStorage.bodyState) {
 			this.data = JSON.parse(window.localStorage.indexedData);
-			document.getElementsByTagName("body")[0].innerHTML = window.localStorage.bodyState;
+			document.getElementsByTagName('body')[0].innerHTML = window.localStorage.bodyState;
 			this.state = JSON.parse(window.localStorage.state);
 			this.setupUI();
 			this.ui.tick.element = document.getElementById('tick');
@@ -172,25 +172,25 @@ TodoController.prototype = {
 
 		this.ui = {
 			body:{ element: document.getElementsByTagName('body')[0] },
-			punch:{ element: document.getElementById("punch") },
+			punch:{ element: document.getElementById('punch') },
 			scheduleContainer:{ element: document.getElementById('schedule-container') },
 			schedule:{
 				element: document.getElementById('schedule'),
 				dayWidth: 480
 			},
 			tick:{ element: null }, // this is generated later
-			todayTitle:{ element: document.getElementById("today-title") },
-			tasks:{ element: document.getElementById("tasks") },
-			calendar:{ element: document.getElementById("calendar") },
-			calendarWrap:{ element: document.getElementById("calendar-wrap") },
-			calendarBody:{ element: document.getElementById("calendar-body") },
-			inbox:{ element: document.getElementById("inbox") },
-			inboxButton:{ element: document.getElementById("inbox-button") },
-			styleButton:{ element: document.getElementById("style-button") },
-			updateButton:{ element: document.getElementById("update-button") },
-			menuContainer:{ element: document.getElementById("menu-container") },
-			styleMenu:{ element: document.getElementById("style-menu") },
-			updateMenu:{ element: document.getElementById("update-menu") }
+			todayTitle:{ element: document.getElementById('today-title') },
+			tasks:{ element: document.getElementById('tasks') },
+			calendar:{ element: document.getElementById('calendar') },
+			calendarWrap:{ element: document.getElementById('calendar-wrap') },
+			calendarBody:{ element: document.getElementById('calendar-body') },
+			inbox:{ element: document.getElementById('inbox') },
+			inboxButton:{ element: document.getElementById('inbox-button') },
+			styleButton:{ element: document.getElementById('style-button') },
+			updateButton:{ element: document.getElementById('update-button') },
+			menuContainer:{ element: document.getElementById('menu-container') },
+			styleMenu:{ element: document.getElementById('style-menu') },
+			updateMenu:{ element: document.getElementById('update-menu') }
 		};
 		this.ui.punch.data = this.ui.punch.element.innerHTML.replace(/<[^>]+>/g, '');
 
@@ -205,10 +205,10 @@ TodoController.prototype = {
 			this.ui.updateMenu.options.push(option.attributes.name.value);
 			option.onclick = function() {
 				switch (this.attributes.name.value) {
-					case "load":
+					case 'load':
 						$this.fetchData({ disk:true });
 						break;
-					case "save":
+					case 'save':
 						$this.flushChanges();
 						break;
 				}
@@ -251,16 +251,16 @@ TodoController.prototype = {
 	setupKeyboardShortcuts: function() {
 		var $this = this;
 		var responders = {
-			32:  /* SPACE */ "addToInbox",
-			37:  /* LEFT  */ "reverseDay",
-			39:  /* RIGHT */ "advanceDay",
-			67:  /* c     */ "toggleCalendar",
-			72:  /* h     */ "reverseDay",
-			73:  /* i     */ "toggleInbox",
-			74:  /* j     */ "advanceMonth",
-			75:  /* k     */ "reverseMonth",
-			76:  /* l     */ "advanceDay",
-			84:  /* t     */ "gotoToday"
+			32:  /* SPACE */ 'addToInbox',
+			37:  /* LEFT  */ 'reverseDay',
+			39:  /* RIGHT */ 'advanceDay',
+			67:  /* c     */ 'toggleCalendar',
+			72:  /* h     */ 'reverseDay',
+			73:  /* i     */ 'toggleInbox',
+			74:  /* j     */ 'advanceMonth',
+			75:  /* k     */ 'reverseMonth',
+			76:  /* l     */ 'advanceDay',
+			84:  /* t     */ 'gotoToday'
 		};
 		document.body.onkeydown = function(event) {
 			// ignore keys with modifiers
@@ -291,7 +291,7 @@ TodoController.prototype = {
 				if (! fetched[key]) return
 			}
 			$this.draw();
-			if (typeof options.callback === "function") {
+			if (typeof options.callback === 'function') {
 				options.callback();
 			}
 		};
@@ -330,7 +330,7 @@ TodoController.prototype = {
 				});
 			}
 		} else {
-			alert("Please use a browser which supports JSON.");
+			alert('Please use a browser which supports JSON.');
 		}
 
 		// fetch punch data
@@ -391,14 +391,14 @@ TodoController.prototype = {
 	},
 	lookupObject: function(indexKey) {
 		var crawl = function(object) {
-			if (typeof object === "object") {
+			if (typeof object === 'object') {
 				if (object.tmpKey == indexKey) {
 					return object;
 				} else {
 					for (var prop in object) {
 						if (object[prop] && object[prop].hasOwnProperty('tmpKey')) {
 							var result = crawl(object[prop]);
-							if (typeof result !== "undefined") return result;
+							if (typeof result !== 'undefined') return result;
 						}
 					}
 				}
@@ -863,7 +863,10 @@ TodoController.prototype = {
 		if (!task) {
 			task = window.prompt('task for inbox');
 		}
+		if (!task)
+			return;
 
+		toggleClass(this.ui.updateButton.element, 'changed', true);
 		$this.state.changes.inbox.push(task);
 		$this.data.children[3].children.push({name: task});
 		$this.draw();
@@ -876,13 +879,14 @@ TodoController.prototype = {
 		this.lockChanges = true;
 		getAjax({
 			method: 'POST',
-			url: "inbox.php?changes=" + encodeURIComponent(JSON.stringify(this.state.changes)),
+			url: 'inbox.php?changes=' + encodeURIComponent(JSON.stringify(this.state.changes)),
 			complete: function() {
 				$this.lockChanges = false;
 			},
 			success: function(data) {
 				if (data == 'ok') {
-					$this.changes.inbox = [];
+					$this.state.changes.inbox = [];
+					toggleClass(button, 'changed', true);
 					toggleClass(button, 'success', true);
 					setTimeout(function() {
 						toggleClass(button, 'success', false);
