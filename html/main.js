@@ -53,6 +53,15 @@ if (!Object.prototype.extends) { // BUG: when used, this method is included in t
 	}
 }
 
+// String.pad
+if (!String.prototype.pad) {
+	String.prototype.pad = function(length, char) {
+		var newString = this;
+		while (newString.length < length) newString = (char.toString() || ' ') + newString;
+		return newString.toString();
+	}
+}
+
 // toggleClass
 var toggleClass = function(element, className, override) {
 	var added = override,
@@ -142,12 +151,14 @@ TodoController.prototype = {
 		console.log(item);
 		// mark edited item for next sync
 	},
-	saveState: function(withDataAndMarkup) {
+	saveState: function(options) {
 		if (window.localStorage) {
 			window.localStorage.state = JSON.stringify(this.state);
-			if (withDataAndMarkup) {
-				window.localStorage.indexedData = JSON.stringify(this.data);
-				window.localStorage.bodyState = document.getElementsByTagName('body')[0].innerHTML;
+			if (options) {
+				if (options.data)
+					window.localStorage.indexedData = JSON.stringify(this.data);
+				if (options.body)
+					window.localStorage.bodyState = document.getElementsByTagName('body')[0].innerHTML;
 			}
 		}
 	},
@@ -404,7 +415,8 @@ TodoController.prototype = {
 					return object;
 				} else {
 					for (var prop in object) {
-						if (object[prop] && object[prop].hasOwnProperty('tmpKey')) {
+						// prop;
+						if (object[prop] && typeof object[prop] === "object") {
 							var result = crawl(object[prop]);
 							if (typeof result !== 'undefined') return result;
 						}
@@ -454,8 +466,11 @@ TodoController.prototype = {
 		return markup;
 	},
 	markupCalendar: function(activeDate) {
-		var time, markup = '<tr>';
-		var today = new Date();
+		var $this = this,
+			time,
+			markup = '<tr>',
+			today = new Date(),
+			todayString = this.dateString(today);
 		today.setHours(0);
 		today.setMinutes(0);
 		today.setSeconds(0);
@@ -469,7 +484,7 @@ TodoController.prototype = {
 		activeDate.setMinutes(0);
 		activeDate.setSeconds(0);
 		activeDate.setMilliseconds(0);
-		this.state.activeDate = activeDate.getTime();
+		activeDateString = this.dateString(activeDate);
 
 		var startDate = new Date(activeDate.getTime());
 		startDate.setDate(1); // start on first of the month
@@ -485,9 +500,9 @@ TodoController.prototype = {
 
 				markingActiveMonthDay = (activeMonth == date.getMonth());
 				var classes = ['calendar-date'];
-				if (today.getTime() === date.getTime())
+				if ($this.dateString(date) == todayString)
 					classes.push('today');
-				if (activeDate.getTime() === date.getTime())
+				if ($this.dateString(date) == activeDateString)
 					classes.push('active');
 				if (markingActiveMonthDay) {
 					classes.push('active-month');
@@ -621,7 +636,7 @@ TodoController.prototype = {
 		this.setupTags();
 		this.setupComments();
 		this.tick();
-		this.saveState(true);
+		this.saveState({body:true,data:true});
 	},
 	update: function() {
 		this.checkRollover();
@@ -859,9 +874,11 @@ TodoController.prototype = {
 	},
 	toggleCalendar: function() {
 		toggleClass(this.ui.calendarWrap.element, 'open');
+		this.saveState({body:true});
 	},
 	toggleInbox: function() {
 		toggleClass(this.ui.inbox.element, 'open');
+		this.saveState({body:true});
 	},
 	addToInbox: function(task) {
 		if (this.lockChanges)
@@ -912,6 +929,16 @@ TodoController.prototype = {
 	},
 	secondsToPixels: function(seconds) {
 		return Math.round(seconds / 86400 * this.ui.schedule.dayWidth);
+	},
+	dateString: function(date) {
+		if (!date) {
+			date = new Date();
+		} else if (!date.getTime) {
+			date = new Date(date)
+		}
+		return date.getDate().toString().pad(2, 0)
+			+ '-' + date.getMonth().toString().pad(2, 0)
+			+ '-' + date.getFullYear().toString();
 	}
 };
 
