@@ -105,9 +105,9 @@ TodoController.prototype = {
 				inbox: []
 			}
 		};
+		this.setupKeyboardShortcuts();
 		if (!this.restoreState()) {
 			this.setupUI();
-			this.setupKeyboardShortcuts();
 			this.fetchData();
 		}
 	},
@@ -674,13 +674,15 @@ TodoController.prototype = {
 	},
 	setupComments: function() { // would be private
 		// toggle comments
-		var $task = document.getElementsByClassName('task');
+		var $this = this,
+			$task = document.getElementsByClassName('task');
 		for (var i = 0; i < $task.length; i++) {
 			$task[i].onclick = function(event) {
 				if (/^[aA]$/.test(event.target.tagName) || /\b(tag|link)\b/.test(event.target.className)) {
 					return true;
 				} else {
 					toggleClass(this, 'collapsed');
+					$this.saveState({body: true});
 				}
 			}
 		}
