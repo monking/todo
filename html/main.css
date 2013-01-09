@@ -98,6 +98,7 @@ body.dark{background-color:#222;color:#FFF}
 .dark .canceled{color:#666;text-decoration:line-through}
 .dark #tick{color:#0CF;border-color:#0CF}
 .dark .current-time{background-color:#000}
+.dark .changed{background-color:#C62 !important;color:#FFF !important}
 .dark .success{background-color:#2C6 !important;color:#FFF !important}
 .dark .footer{background-color:rgba(20,20,20,0.5)}
 
@@ -147,6 +148,7 @@ body.light{background-color:#EEE;color:#222}
 .light .canceled{color:#666;text-decoration:line-through}
 .light #tick{color:#09E;border-color:#09E}
 .light .current-time{background-color:#FFF}
+.light .changed{background-color:#C62 !important;color:#000 !important}
 .light .success{background-color:#2C6 !important;color:#000 !important}
 .light .footer{background-color:rgba(255,255,255,0.5)}
 

@@ -338,6 +338,8 @@ TodoController.prototype = {
 				parseTodo(window.localStorage.todo);
 				setFetched('todo');
 			} else {
+				if (this.state.changes && !confirm("changes queued, load anyway?"))
+					return false;
 				getAjax({
 					url: 'todo.json.php' + (options.disk ? '?f' : ''),
 					success: function(data) {
@@ -778,7 +780,7 @@ TodoController.prototype = {
 		var today = this.data.children[0].children[0].children[0];
 		var $events = document.getElementsByClassName('event');
 		var i, j;
-		var now = this.now.getTime() / 1000;
+		var now = this.now.getTime() / 1000 - 120 * this.now.getTimezoneOffset();
 		for (i = 0; i < $events.length; i++) {
 			var start = parseInt($events[i].attributes.start.value);
 			var end = parseInt($events[i].attributes.end.value);
@@ -901,7 +903,12 @@ TodoController.prototype = {
 	},
 	queueChange: function(address, data) {
 		// so far only works for inbox
+		if (!this.state.changes)
+			this.state.changes = {};
+		if (!this.state.changes[address])
+			this.state.changes[address] = [];
 		this.state.changes[address].push(data);
+		toggleClass(this.ui.updateButton.element, "changed", true);
 		this.saveState();
 	},
 	flushChanges: function() {
@@ -917,10 +924,10 @@ TodoController.prototype = {
 			},
 			success: function(data) {
 				if (data == 'ok') {
-					$this.state.changes.inbox = [];
+					$this.state.changes = null;
 					$this.saveState();
-					toggleClass(button, 'changed', true);
 					toggleClass(button, 'success', true);
+					toggleClass(button, "changed", false);
 					setTimeout(function() {
 						toggleClass(button, 'success', false);
 					}, 1000);
