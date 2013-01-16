@@ -101,9 +101,7 @@ TodoController.prototype = {
 	init: function() {
 		var $this = this;
 		this.state = {
-			changes: {
-				inbox: []
-			}
+			changes: null
 		};
 		this.setupKeyboardShortcuts();
 		if (!this.restoreState()) {
