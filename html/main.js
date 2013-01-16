@@ -114,7 +114,7 @@ TodoController.prototype = {
 	add: function(parent, data) {
 		if (! parent.hasOwnProperty('contains') || ! types.hasOwnProperty(parent.contains)) return;
 		var $this = this;
-		var now = this.now.getTime();
+		var now = Math.round(this.now.getTime() / 1000);
 		var types = {
 			event: function(data) {
 				return data.extends({ name: 'Untitled', start: now, segments: [] });
@@ -780,7 +780,7 @@ TodoController.prototype = {
 		var today = this.data.children[0].children[0].children[0];
 		var $events = document.getElementsByClassName('event');
 		var i, j;
-		var now = this.now.getTime() / 1000 - 120 * this.now.getTimezoneOffset();
+		var now = Math.round(this.now.getTime() / 1000);
 		for (i = 0; i < $events.length; i++) {
 			var start = parseInt($events[i].attributes.start.value);
 			var end = parseInt($events[i].attributes.end.value);
@@ -838,7 +838,7 @@ TodoController.prototype = {
 	markupTags: function(string) {
 		// string = string.replace(/\b([#@]([a-zA-Z][a-zA-Z0-9_]+))/g, '<span class="tag $2">$1</span>');
 		string = string.replace(/([#@]([a-zA-Z][a-zA-Z0-9_]+))/g, '<span class="tag $2">$1</span>');
-		string = string.replace(/(https?:\/\/[^\s]*)/g, '<a href="$1">$1</a>');
+		string = string.replace(/(https?:\/\/[^\s]*)/g, '<a href="$1" target="_blank">$1</a>');
 		return string;
 	},
 	switchStyle: function(style) {
