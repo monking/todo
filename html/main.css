@@ -24,6 +24,12 @@ body{margin:0;padding:20px 10px 120px 10px;background-color;#000}
 .event .name{padding-left:0.5em}
 
 .task{margin-left:2em;padding-left:2em;text-indent:-2em}
+.urgent{font-weight:bold;font-style:italic;-webkit-animation: pulsate 1s ease-out;-webkit-animation-iteration-count: infinite;opacity: 0.8}
+@-webkit-keyframes pulsate {
+    0% {opacity: 0.8}
+    50% {opacity: 1.0}
+    100% {opacity: 0.8}
+}
 .comment{text-indent:0;margin:0.5em 0}
 
 .button{text-decoration:none;padding:1em 0.3em;margin:0 0.2em;border-radius:0.5em;font-size:140%;cursor:pointer;border:3px solid;text-align:center}
@@ -95,6 +101,7 @@ body.dark{background-color:#222;color:#FFF}
 .dark .hold{color:#666}
 .dark .maybe{color:#97B}
 .dark .note{color:#EAA}
+.dark .urgent{color:#FCC}
 .dark .canceled{color:#666;text-decoration:line-through}
 .dark #tick{color:#0CF;border-color:#0CF}
 .dark .current-time{background-color:#000}
@@ -145,6 +152,7 @@ body.light{background-color:#EEE;color:#222}
 .light .hold{color:#666}
 .light .maybe{color:#97B}
 .light .note{color:#EAA}
+.light .urgent{color:#C00}
 .light .canceled{color:#666;text-decoration:line-through}
 .light #tick{color:#09E;border-color:#09E}
 .light .current-time{background-color:#FFF}
@@ -191,6 +199,7 @@ body.black{background-color:#000;color:#FFF}
 .black .hold{color:#666}
 .black .maybe{color:#97B}
 .black .note{color:#EAA}
+.black .urgent{color:#FCC}
 .black .canceled{color:#666;text-decoration:line-through}
 .black #tick{color:#0CF;border-color:#0CF}
 .black .current-time{background-color:#000}
@@ -236,6 +245,7 @@ body.night{background-color:#200;color:#C00}
 .night .hold{color:#600}
 .night .maybe{color:#A00}
 .night .note{color:#A00}
+.night .urgent{color:#F00}
 .night .canceled{color:#600;text-decoration:line-through;background-color:#300}
 .night #tick{color:#F00;border-color:#F00}
 .night .current-time{background-color:#000}
