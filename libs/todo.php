@@ -30,6 +30,10 @@ class Todo {
 			array('project'),
 			array('task'),
 		),
+		'abstract' => array(
+			array('section'),
+			array('focus')
+		),
 		'inbox' => array(
 			array('section'),
 			null,
