@@ -49,21 +49,28 @@ require_once('../config.php');
 		<div id="inbox"></div>
 		<div id="menu-container">
 			<div id="update-menu" class="menu">
-				<div class="button save" name="save">SAVE</div>
-				<div class="button load" name="load">LOAD</div>
-				<div class="button load" name="load">EDIT</div>
+				<button class="save" name="save">SAVE</button>
+				<button class="load" name="load">LOAD</button>
+				<button class="load" name="load">EDIT</button>
 			</div>
-			<div id="style-menu" class="menu">
-				<div class="button sample-dark" name="dark">DARK</div>
-				<div class="button sample-light" name="light">LIGHT</div>
-				<div class="button sample-black" name="black">BLACK</div>
-				<div class="button sample-night" name="night">NIGHT</div>
+			<div id="options-menu" class="menu">
+				<div class="opt-group cf" name="options">
+					<label>Options</label>
+					<button name="notifications">Enable Notifications</button>
+				</div>
+				<div class="opt-group cf" name="styles">
+					<label>Styles</label>
+					<button class="sample-dark" name="dark">DARK</button>
+					<button class="sample-light" name="light">LIGHT</button>
+					<button class="sample-black" name="black">BLACK</button>
+					<button class="sample-night" name="night">NIGHT</button>
+				</div>
 			</div>
 		</div>
 		<div class="footer">
-			<div class="button" id="inbox-button">INBOX</div>
-			<div class="button" id="style-button">STYLE</div>
-			<div class="button" id="update-button">UPDATE</div>
+			<button id="inbox-button">INBOX</button>
+			<button id="options-button">OPTIONS</button>
+			<button id="update-button">UPDATE</button>
 		</div>
 	</body>
 </html>

@@ -154,6 +154,14 @@ class Todo {
 						self::checkTimezone($content);
 						$event->start = date_timestamp_get(DateTime::createFromFormat('d-m-Y Hi', $parent_object->date . ' ' . $event->start));
 					}
+					preg_match_all('/ !(\d+)/', $event->name, $reminders, PREG_SET_ORDER);
+					if ($reminders) {
+						$event->remind = array();
+						foreach($reminders as $reminder) {
+							$event->remind[] = intval($reminder[1]) * 60;
+						}
+					}
+					$event->name = preg_replace('/ !\d+/', '', $event->name);
                     preg_match('/^.*?[|x\~>?][|x\~>? -]*/', $content, $segments);
                     if ($segments) {
                         $segments = substr($segments[0], 1); // drop leading space in formatting

@@ -105,6 +105,7 @@ TodoController.prototype = {
 		};
 		this.setupKeyboardShortcuts();
 		if (!this.restoreState()) {
+			this.setupNotifications();
 			this.setupUI();
 			this.fetchData();
 		}
@@ -112,13 +113,12 @@ TodoController.prototype = {
 	add: function(parent, data) {
 		if (! parent.hasOwnProperty('contains') || ! types.hasOwnProperty(parent.contains)) return;
 		var $this = this;
-		var now = Math.round(this.now.getTime() / 1000);
 		var types = {
 			event: function(data) {
-				return data.extends({ name: 'Untitled', start: now, segments: [] });
+				return data.extends({ name: 'Untitled', start: $this.uTime, segments: [] });
 			},
 			segment: function(data) {
-				return data.extends({ start: now, end: now, type: '' });
+				return data.extends({ start: $this.uTime, end: $this.uTime, type: '' });
 			},
 			task: function(data) {
 				return data.extends({ name: 'Untitled' });
@@ -168,6 +168,7 @@ TodoController.prototype = {
 			&& window.localStorage.bodyState) {
 				this.data = JSON.parse(window.localStorage.indexedData);
 				document.getElementsByTagName('body')[0].innerHTML = window.localStorage.bodyState;
+				this.setupNotifications();
 				this.setupUI();
 				this.ui.tick.element = document.getElementById('tick');
 				this.connectCalendarUI();
@@ -182,7 +183,7 @@ TodoController.prototype = {
 		return false;
 	},
 	setupUI: function() {
-		var $this = this;
+		var $this = this, i, j, optGroup, buttons, button;
 
 		this.ui = {
 			body:{ element: document.getElementsByTagName('body')[0] },
@@ -200,10 +201,10 @@ TodoController.prototype = {
 			calendarBody:{ element: document.getElementById('calendar-body') },
 			inbox:{ element: document.getElementById('inbox') },
 			inboxButton:{ element: document.getElementById('inbox-button') },
-			styleButton:{ element: document.getElementById('style-button') },
+			optionsButton:{ element: document.getElementById('options-button') },
 			updateButton:{ element: document.getElementById('update-button') },
 			menuContainer:{ element: document.getElementById('menu-container') },
-			styleMenu:{ element: document.getElementById('style-menu') },
+			optionsMenu:{ element: document.getElementById('options-menu') },
 			updateMenu:{ element: document.getElementById('update-menu') }
 		};
 		this.ui.punch.data = this.ui.punch.element.innerHTML.replace(/<[^>]+>/g, '');
@@ -212,12 +213,10 @@ TodoController.prototype = {
 		this.ui.updateButton.element.onclick = function() {
 			$this.toggleMenu($this.ui.updateMenu);
 		};
-		this.ui.updateMenu.children = this.ui.updateMenu.element.children;
-		this.ui.updateMenu.options = [];
-		for (var i = 0; i < this.ui.updateMenu.children.length; i++) {
-			var option = this.ui.updateMenu.children[i];
-			this.ui.updateMenu.options.push(option.attributes.name.value);
-			option.onclick = function() {
+		this.ui.updateMenu.buttons = this.ui.updateMenu.element.getElementsByTagName("button");
+		for (i = 0; i < this.ui.updateMenu.buttons.length; i++) {
+			button = this.ui.updateMenu.buttons[i];
+			button.onclick = function() {
 				switch (this.attributes.name.value) {
 					case 'load':
 						$this.fetchData({ disk:true });
@@ -230,18 +229,38 @@ TodoController.prototype = {
 			};
 		}
 
-		// Style Menu
-		this.ui.styleButton.element.onclick = function() {
-			$this.toggleMenu($this.ui.styleMenu);
+		// Options Menu
+		this.ui.optionsButton.element.onclick = function() {
+			$this.toggleMenu($this.ui.optionsMenu);
 		};
-		this.ui.styleMenu.children = this.ui.styleMenu.element.children;
-		this.ui.styleMenu.options = [];
-		for (var i = 0; i < this.ui.styleMenu.children.length; i++) {
-			var option = this.ui.styleMenu.children[i];
-			this.ui.styleMenu.options.push(option.attributes.name.value);
-			option.onclick = function() {
-				$this.switchStyle(this.attributes.name.value);
-			};
+		optGroups = this.ui.optionsMenu.element.getElementsByClassName("opt-group");
+		for (i = 0; i < optGroups.length; i++) {
+			buttons = optGroups[i].getElementsByTagName("button");
+			var groupName = optGroups[i].attributes.name.value;
+			switch (optGroups[i].attributes.name.value) {
+				case "options":
+					for (j = 0; j < buttons.length; j++) {
+						button = buttons[j];
+						if (button.attributes.name.value === "notifications") {
+							button.onclick = function() {
+								$this.toggleNotifications();
+								$this.toggleMenu($this.ui.optionsMenu, false);
+							};
+						}
+					}
+					break;
+				case "styles":
+					this.ui.optionsMenu.styles = [];
+					for (j = 0; j < buttons.length; j++) {
+						button = buttons[j];
+						this.ui.optionsMenu.styles.push(button.attributes.name.value);
+						button.onclick = function() {
+							$this.switchStyle(this.attributes.name.value);
+							$this.toggleMenu(this.ui.optionsMenu, false);
+						};
+					}
+					break;
+			}
 		}
 		if (window.localStorage && window.localStorage.style) {
 			this.switchStyle(window.localStorage.style);
@@ -261,6 +280,42 @@ TodoController.prototype = {
 		// Schedule
 		if (this.state.scheduleScroll)
 			this.ui.scheduleContainer.element.scrollLeft = this.state.scheduleScroll;
+	},
+	setupNotifications: function() {
+		this.notified = {};
+		if (typeof this.state.notifications === "undefined") {
+			this.state.notifications = !!(window.webkitNotifications && !window.webkitNotifications.checkPermission());
+		}
+	},
+	toggleNotifications: function() {
+		var $this = this;
+		if (this.state.notifications) {
+			this.state.notifications = false;
+		} else {
+			if (window.webkitNotifications) {
+				if (window.webkitNotifications.checkPermission()) {
+					window.webkitNotifications.requestPermission(function() {
+						$this.state.notifications = true;
+						$this.remind();
+					});
+				} else {
+					this.state.notifications = true;
+				}
+			}
+		}
+	},
+	notify: function(id, message, title, force) {
+		if (!this.state.notifications || (!force && typeof this.notified[id] !== "undefined"))
+			return;
+
+		if (typeof title === "undefined")
+			title = "TODO";
+
+		if (window.webkitNotifications && !window.webkitNotifications.checkPermission()) {
+			var n = window.webkitNotifications.createNotification("/favicon.ico", title, message);
+			n.show();
+		}
+		this.notified[id] = true;
 	},
 	setupKeyboardShortcuts: function() {
 		var $this = this;
@@ -640,8 +695,26 @@ TodoController.prototype = {
 	},
 	update: function() {
 		this.checkRollover();
+		this.remind();
 		this.updateSchedule();
 		this.updatePunch();
+	},
+	remind: function() {
+		var today, event, i, j;
+		var today = this.findDay(this.now);
+		if (!today.schedule) return;
+
+		for (i = 0; i < today.schedule.length; i++) {
+			event = today.schedule[i];
+			if (!event.remind) continue;
+
+			for (j = 0; j < event.remind.length; j++) {
+				if (this.uTime >= event.start - event.remind[j] && this.uTime <= event.start) {
+					minutes = Math.round((event.start - this.uTime) / 60);
+					this.notify(event.tmpKey.toString() + j, event.name + " (in " + minutes + " min.)", "Todo Event");
+				}
+			}
+		}
 	},
 	connectCalendarUI: function() {
 		var $this = this;
@@ -824,6 +897,7 @@ TodoController.prototype = {
 	tick: function(suppressRepeat) {
 		var $this = this;
 		this.now = new Date();
+		this.uTime = Math.round(this.now.getTime() / 1000);
 		if (this.interval) this.stopTick();
 		if (!suppressRepeat)
 			this.interval = setTimeout(function() { $this.tick(); }, 60010 - (this.now).getTime() % 60000);
@@ -844,14 +918,13 @@ TodoController.prototype = {
 		if (window.localStorage) {
 			window.localStorage.style = style;
 		}
-		for (var i = 0; i < this.ui.styleMenu.options.length; i++) {
+		for (var i = 0; i < this.ui.optionsMenu.styles.length; i++) {
 			toggleClass(
 				this.ui.body.element,
-				this.ui.styleMenu.options[i],
-				this.ui.styleMenu.options[i] == style
+				this.ui.optionsMenu.styles[i],
+				this.ui.optionsMenu.styles[i] == style
 			);
 		}
-		this.toggleMenu(this.ui.styleMenu, false);
 	},
 	toggleMenu: function(menuObject, override) {
 		var isOpen;

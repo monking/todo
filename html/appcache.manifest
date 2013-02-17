@@ -1,4 +1,4 @@
-CACHE MANIFEST
+#CACHE MANIFEST
 
 CACHE:
 favicon.ico
@@ -15,7 +15,6 @@ images/tx-to-ff0000.png
 images/tx-to-ffffff.png
 images/tx-to-invert-000000.png
 images/tx-to-invert-ffffff.png
-index.php
 main.css
 main.js
 http://themes.googleusercontent.com/static/fonts/droidsansmono/v4/ns-m2xQYezAtqh7ai59hJaH0X__W3S3MJL29bc5CWfs.woff
