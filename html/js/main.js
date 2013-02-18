@@ -529,34 +529,37 @@ TodoController.prototype = {
 		return crawl(this.data, indexKey);
 	},
 	markupSchedule: function(day, todayTime) {
-		var i, j, markup = '';
+		var i, j, markup = '', event, time, hours, minutes, classes, eventEnd, left, segment, width, nameLeft;
 
 		if (!todayTime)
 			todayTime = day.time
 
 		if (day.hasOwnProperty('schedule')) {
 			for (i = 0; i < day.schedule.length; i++) {
-				var event = day.schedule[i];
+				event = day.schedule[i];
 
-				var time = new Date(event.start * 1000);
-				var hours = time.getHours().toString();
+				time = new Date(event.start * 1000);
+				hours = time.getHours().toString();
 				if (hours.length < 2) hours = '0' + hours;
-				var minutes = time.getMinutes().toString();
+				minutes = time.getMinutes().toString();
 				if (minutes.length < 2) minutes = '0' + minutes;
-				var eventEnd = event.children[event.children.length - 1].end;
-				var left = this.secondsToPixels(event.start - todayTime);
-				markup += '<div class="event" start="' + event.start + '" end="' + eventEnd + '" style="'
+				eventEnd = event.children[event.children.length - 1].end;
+				left = this.secondsToPixels(event.start - todayTime);
+				classes = ["event"];
+				if (typeof event.remind !== "undefined")
+					classes.push("remind");
+				markup += '<div class="' + classes.join(' ') + '" start="' + event.start + '" end="' + eventEnd + '" style="'
 						+ 'margin-left:' + left + 'px;'
 					+ '">';
 				for (j = 0; j < event.children.length; j++) {
-					var segment = event.children[j];
-					var left = this.secondsToPixels(segment.start - event.start);
-					var width = this.secondsToPixels(segment.end - segment.start);
+					segment = event.children[j];
+					left = this.secondsToPixels(segment.start - event.start);
+					width = this.secondsToPixels(segment.end - segment.start);
 					markup += '<div class="segment ' + segment.type + '"'
 						+ ' style="left:' + left + 'px;width:' + width + 'px"'
 						+ ' start="' + segment.start + '" end="' + segment.end + '"><div class="remaining"></div></div>'
 				}
-				var nameLeft = this.secondsToPixels(eventEnd - event.start);
+				nameLeft = this.secondsToPixels(eventEnd - event.start);
 				markup += '<div class="name" style="left:' + nameLeft + 'px">'
 							+ hours + ':' + minutes + ' '
 							+ this.markupTags(event.name)
@@ -759,7 +762,7 @@ TodoController.prototype = {
 				notificationId = event.tmpKey.toString() + "_" + j;
 				isOpen = (typeof this.notifications.open[notificationId] !== "undefined");
 				minutes = Math.ceil((event.start - this.uTime) / 60);
-				if (isOpen || (minutes >= 0 && minutes * 60 < event.remind[j])) {
+				if (isOpen || (minutes >= 0 && minutes * 60 <= event.remind[j])) {
 					if (minutes > 0) {
 						timeLeft = "in " + minutes + " min.";
 					} else if (minutes < 0) {
