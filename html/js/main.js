@@ -333,6 +333,7 @@ TodoController.prototype = {
 			title = "TODO";
 
 		if (window.webkitNotifications && !window.webkitNotifications.checkPermission()) {
+			/*
 			if (typeof this.notifications.open[id] !== "undefined") {
 				// FIXME: delay of close event deletes the entry for the new
 				// notification about to be created, not the old one being
@@ -341,6 +342,7 @@ TodoController.prototype = {
 				this.notifications.open[id].close();
 				delete this.notifications.open[id];
 			}
+			*/
 			for (openId in this.notifications.open) {
 				// FIXME: accounting for enumerable `extends` function
 				if (typeof this.notifications.open[openId] === "function") continue;
@@ -529,7 +531,7 @@ TodoController.prototype = {
 		return crawl(this.data, indexKey);
 	},
 	markupSchedule: function(day, todayTime) {
-		var i, j, markup = '', event, time, hours, minutes, classes, eventEnd, left, segment, width, nameLeft;
+		var i, j, markup = '', event, classes, eventEnd, left, segment, width, nameLeft;
 
 		if (!todayTime)
 			todayTime = day.time
@@ -538,11 +540,6 @@ TodoController.prototype = {
 			for (i = 0; i < day.schedule.length; i++) {
 				event = day.schedule[i];
 
-				time = new Date(event.start * 1000);
-				hours = time.getHours().toString();
-				if (hours.length < 2) hours = '0' + hours;
-				minutes = time.getMinutes().toString();
-				if (minutes.length < 2) minutes = '0' + minutes;
 				eventEnd = event.children[event.children.length - 1].end;
 				left = this.secondsToPixels(event.start - todayTime);
 				classes = ["event"];
@@ -562,7 +559,7 @@ TodoController.prototype = {
 				if (typeof event.remind !== "undefined") {
 					markup += '<div class="icon remind"></div>';
 				}
-				markup += hours + ':' + minutes + ' '
+				markup += this.formatTime(new Date(event.start * 1000)) + ' '
 							+ this.markupTags(event.name)
 						+ '</div>'
 					+ '</div>';
@@ -570,6 +567,14 @@ TodoController.prototype = {
 		}
 
 		return markup;
+	},
+	formatTime: function(time) {
+		var time, hours, minutes;
+		hours = time.getHours().toString();
+		if (hours.length < 2) hours = '0' + hours;
+		minutes = time.getMinutes().toString();
+		if (minutes.length < 2) minutes = '0' + minutes;
+		return hours + ':' + minutes;
 	},
 	markupCalendar: function(activeDate) {
 		var $this = this,
@@ -763,7 +768,7 @@ TodoController.prototype = {
 				notificationId = event.tmpKey.toString() + "_" + j;
 				isOpen = (typeof this.notifications.open[notificationId] !== "undefined");
 				minutes = Math.ceil((event.start - this.uTime) / 60);
-				if (isOpen || (minutes >= 0 && minutes * 60 <= event.remind[j])) {
+				if (!isOpen && minutes >= 0 && minutes * 60 <= event.remind[j]) {
 					if (minutes > 0) {
 						timeLeft = "in " + minutes + " min.";
 					} else if (minutes < 0) {
@@ -771,7 +776,7 @@ TodoController.prototype = {
 					} else {
 						timeLeft = "NOW";
 					}
-					this.notify(notificationId, event.name + " (" + timeLeft + ")", "Todo Event");
+					this.notify(notificationId, this.formatTime(new Date(event.start * 1000)) + ' - ' + event.name + " (" + timeLeft + ")", "Todo Event");
 					break;
 				}
 			}
