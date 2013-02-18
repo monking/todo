@@ -109,6 +109,17 @@ TodoController.prototype = {
 			this.setupUI();
 			this.fetchData();
 		}
+		window.onunload = function() {
+			$this.clear();
+		};
+	},
+	clear: function() {
+		for(var id in this.notifications.open) {
+			if (typeof this.notifications.open[id] !== "function") {
+				// FIXME: counter-hack for 'extends' being enumerable
+				this.notifications.open[id].close();
+			}
+		}
 	},
 	add: function(parent, data) {
 		if (! parent.hasOwnProperty('contains') || ! types.hasOwnProperty(parent.contains)) return;
@@ -282,7 +293,10 @@ TodoController.prototype = {
 			this.ui.scheduleContainer.element.scrollLeft = this.state.scheduleScroll;
 	},
 	setupNotifications: function() {
-		this.notified = {};
+		this.notifications = {
+			open:{},
+			log:{}
+		};
 		if (typeof this.state.notifications === "undefined") {
 			this.state.notifications = !!(window.webkitNotifications && !window.webkitNotifications.checkPermission());
 		}
@@ -305,17 +319,45 @@ TodoController.prototype = {
 		}
 	},
 	notify: function(id, message, title, force) {
-		if (!this.state.notifications || (!force && typeof this.notified[id] !== "undefined"))
+		var $this = this, openId, count = 0, first;
+		if (
+			!this.state.notifications
+			|| (!force
+				&& typeof this.notifications.open[id] === "undefined"
+				&& typeof this.notifications.log[id] !== "undefined")
+			) {
 			return;
+		}
 
 		if (typeof title === "undefined")
 			title = "TODO";
 
 		if (window.webkitNotifications && !window.webkitNotifications.checkPermission()) {
-			var n = window.webkitNotifications.createNotification("/favicon.ico", title, message);
-			n.show();
+			if (typeof this.notifications.open[id] !== "undefined") {
+				// FIXME: delay of close event deletes the entry for the new
+				// notification about to be created, not the old one being
+				// closed
+				this.notifications.open[id].onclose = function() {};
+				this.notifications.open[id].close();
+				delete this.notifications.open[id];
+			}
+			for (openId in this.notifications.open) {
+				// FIXME: accounting for enumerable `extends` function
+				if (typeof this.notifications.open[openId] === "function") continue;
+				if (!first) first = this.notifications.open[openId];
+				count++;
+			}
+			if (count > 3) {
+				first.close();
+			}
+
+			this.notifications.open[id] = window.webkitNotifications.createNotification("/favicon.ico", title, message);
+			this.notifications.open[id].onclose = function() {
+				delete $this.notifications.open[id];
+			};
+			this.notifications.open[id].show();
 		}
-		this.notified[id] = true;
+		this.notifications.log[id] = true;
 	},
 	setupKeyboardShortcuts: function() {
 		var $this = this;
@@ -705,7 +747,7 @@ TodoController.prototype = {
 		this.updatePunch();
 	},
 	remind: function() {
-		var today, event, i, j;
+		var today, event, i, j, minutes, timeLeft, notificationId, isOpen;
 		var today = this.findDay(this.now);
 		if (!today.schedule) return;
 
@@ -714,9 +756,19 @@ TodoController.prototype = {
 			if (!event.remind) continue;
 
 			for (j = 0; j < event.remind.length; j++) {
-				if (this.uTime >= event.start - event.remind[j] && this.uTime <= event.start) {
-					minutes = Math.round((event.start - this.uTime) / 60);
-					this.notify(event.tmpKey.toString() + j, event.name + " (in " + minutes + " min.)", "Todo Event");
+				notificationId = event.tmpKey.toString() + "_" + j;
+				isOpen = (typeof this.notifications.open[notificationId] !== "undefined");
+				minutes = Math.ceil((event.start - this.uTime) / 60);
+				if (isOpen || (minutes >= 0 && minutes * 60 < event.remind[j])) {
+					if (minutes > 0) {
+						timeLeft = "in " + minutes + " min.";
+					} else if (minutes < 0) {
+						timeLeft = Math.abs(minutes) + " min. ago";
+					} else {
+						timeLeft = "NOW";
+					}
+					this.notify(notificationId, event.name + " (" + timeLeft + ")", "Todo Event");
+					break;
 				}
 			}
 		}
