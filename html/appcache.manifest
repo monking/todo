@@ -1,7 +1,11 @@
 CACHE MANIFEST
 
 CACHE:
+css/main.css
 favicon.ico
+img/icons-000000.png
+img/icons-ff0000.png
+img/icons-ffffff.png
 img/schedule-bg-000000.png
 img/schedule-bg-ff0000.png
 img/schedule-bg-ffffff.png
@@ -15,7 +19,6 @@ img/tx-to-ff0000.png
 img/tx-to-ffffff.png
 img/tx-to-invert-000000.png
 img/tx-to-invert-ffffff.png
-css/main.css
 js/main.js
 http://themes.googleusercontent.com/static/fonts/droidsansmono/v4/ns-m2xQYezAtqh7ai59hJaH0X__W3S3MJL29bc5CWfs.woff
 

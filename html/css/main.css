@@ -22,6 +22,9 @@ body{margin:0;padding:20px 10px 120px 10px;background-color;#000}
 .collapsed .comment{position:absolute;top:0.2em;left:-1em;overflow:hidden;width:0.5em;height:1em;text-indent:-9999em;cursor:pointer;margin:0;padding:0}
 .tag{cursor:pointer}
 
+.icon{background-size:8px;display:inline-block}
+.icon.remind{background-position:0px 0px;width:8px;height:8px}
+
 #schedule-container{margin:0 0 1em;position:relative;overflow-y:hidden;overflow-x:auto;-webkit-overflow-scrolling:touch}
 #schedule{position:relative;padding:75px 0 8px;min-width:960px;background-size:480px;background-position:0px 50px;background-repeat:repeat-x}
 
@@ -32,6 +35,7 @@ body{margin:0;padding:20px 10px 120px 10px;background-color;#000}
 .segment,.remaining{background-position:right center;background-size:24px}
 .event .remaining{position:absolute;right:0;height:100%}
 .event .name{padding-left:0.5em}
+.event .name .remind{margin-right:0.5em}
 
 .task{margin-left:2em;padding-left:2em;text-indent:-2em}
 .urgent{font-weight:bold;font-style:italic;-webkit-animation: pulsate 1s ease-out;-webkit-animation-iteration-count: infinite;opacity: 0.8}
@@ -91,6 +95,7 @@ body.dark{background-color:#222;color:#FFF}
 .dark .collapsed .comment{background-color:#468}
 .dark .tag{color:#CA7}
 .dark .tag.highlight{background-color:#FD9;color:#000;outline:2px solid #FD9}
+.dark .icon{background-image:url(../img/icons-ffffff.png)}
 
 .dark #schedule{background-image:url(../img/schedule-bg-ffffff.png)}
 .dark .busy{background-color:rgba(255,255,255,0.3);box-shadow:inset 2px 0 0 #FFF}
@@ -141,6 +146,7 @@ body.light{background-color:#EEE;color:#222}
 .light .collapsed .comment{outline: 1ps solid #000}
 .light .tag{color:#C60}
 .light .tag.highlight{background-color:#FD9;color:#000;outline:2px solid #FD9}
+.light .icon{background-image:url(../img/icons-000000.png)}
 
 .light #schedule{background-image:url(../img/schedule-bg-000000.png)}
 .light .busy{background-color:rgba(0,0,0,0.2);box-shadow:inset 2px 0 0 #000}
@@ -189,6 +195,7 @@ body.black{background-color:#000;color:#FFF}
 .black .collapsed .comment{background-color:#468}
 .black .tag{color:#CA7}
 .black .tag.highlight{background-color:#FD9;color:#000;outline:2px solid #FD9}
+.black .icon{background-image:url(../img/icons-ffffff.png)}
 
 .black #schedule{background-image:url(../img/schedule-bg-ffffff.png)}
 .black .busy{background-color:rgba(255,255,255,0.3);box-shadow:inset 2px 0 0 #FFF}
@@ -235,6 +242,7 @@ body.night{background-color:#200;color:#C00}
 .night .collapsed .comment{background-color:#900}
 .night .tag{color:#F00}
 .night .tag.highlight{background-color:#E00;color:#000;outline:2px solid #E00}
+.night .icon{background-image:url(../img/icons-ff0000.png)}
 
 .night #schedule{background-image:url(../img/schedule-bg-ff0000.png)}
 .night .busy{background-color:rgba(255,0,0,0.3);box-shadow:inset 2px 0 0 #F00}

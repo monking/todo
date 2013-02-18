@@ -546,9 +546,7 @@ TodoController.prototype = {
 				eventEnd = event.children[event.children.length - 1].end;
 				left = this.secondsToPixels(event.start - todayTime);
 				classes = ["event"];
-				if (typeof event.remind !== "undefined")
-					classes.push("remind");
-				markup += '<div class="' + classes.join(' ') + '" start="' + event.start + '" end="' + eventEnd + '" style="'
+				markup += '<div class="event" start="' + event.start + '" end="' + eventEnd + '" style="'
 						+ 'margin-left:' + left + 'px;'
 					+ '">';
 				for (j = 0; j < event.children.length; j++) {
@@ -560,8 +558,11 @@ TodoController.prototype = {
 						+ ' start="' + segment.start + '" end="' + segment.end + '"><div class="remaining"></div></div>'
 				}
 				nameLeft = this.secondsToPixels(eventEnd - event.start);
-				markup += '<div class="name" style="left:' + nameLeft + 'px">'
-							+ hours + ':' + minutes + ' '
+				markup += '<div class="name" style="left:' + nameLeft + 'px">';
+				if (typeof event.remind !== "undefined") {
+					markup += '<div class="icon remind"></div>';
+				}
+				markup += hours + ':' + minutes + ' '
 							+ this.markupTags(event.name)
 						+ '</div>'
 					+ '</div>';
