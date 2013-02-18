@@ -3,7 +3,8 @@ $params = explode('/', preg_replace('@^/@', '', $_SERVER['REQUEST_URI']));
 require_once('../config.php');
 ?>
 <!DOCTYPE html>
-<html manifest="appcache.manifest">
+<!-- <html manifest="appcache.manifest"> -->
+<html>
 	<head>
 		<title>TODO</title>
 
@@ -11,16 +12,16 @@ require_once('../config.php');
 		<meta name="apple-mobile-web-app-capable" content="yes" />
 
 		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-		<link rel="apple-touch-icon" href="/apple-touch-icon.png"/>
+		<link rel="apple-touch-icon" href="/img/apple-touch-icon.png"/>
 
-		<link rel="apple-touch-startup-image" href="/apple-touch-icon.png" />
+		<link rel="apple-touch-startup-image" href="/img/apple-touch-icon.png" />
 
 		<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
 		<link rel="icon" href="/favicon.ico" type="image/x-icon">
 		<meta name="robots" content="noindex, nofollow" />
 		<!-- <link href="http://fonts.googleapis.com/css?family=Droid+Sans+Mono" rel="stylesheet" type="text/css"> -->
-		<link href="main.css" rel='stylesheet' type='text/css'>
-		<script type="text/javascript" src="main.js"></script>
+		<link href="css/main.css" rel='stylesheet' type='text/css'>
+		<script type="text/javascript" src="js/main.js"></script>
 	</head>
 	<body class="dark">
 		<div id="punch"></div>

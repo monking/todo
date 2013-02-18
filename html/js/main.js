@@ -394,7 +394,7 @@ TodoController.prototype = {
 				if (this.state.changes && !confirm("changes queued, load anyway?"))
 					return false;
 				getAjax({
-					url: 'todo.json.php' + (options.disk ? '?f' : ''),
+					url: 'api.php?action=json' + (options.disk ? '&f' : ''),
 					success: function(data) {
 						parseTodo(data);
 					},
@@ -419,7 +419,7 @@ TodoController.prototype = {
 			setFetched('punch');
 		} else {
 			getAjax({
-				url: 'punch.php',
+				url: 'api.php?action=punch',
 				success: function(data) {
 					parsePunch(data);
 				},
@@ -429,6 +429,7 @@ TodoController.prototype = {
 			});
 		}
 	},
+	/*
 	saveData: function() {
 		var $this = this;
 		var data = JSON.parse(JSON.stringify(this.data));
@@ -444,25 +445,29 @@ TodoController.prototype = {
 		stripIndex(data);
 		var json = JSON.stringify(data);
 		window.getAjax({
-			url: 'save.php',
+			url: 'api.php?action=save',
 			method: 'POST',
 			data: 'data=' + encodeURIComponent(json),
 			success: function(data) {
-				if (data == 'ok') {
-					var button = filterChildren($this.ui.updateMenu.element, 'save')[0];
-					toggleClass(button, 'success', true);
-					setTimeout(function() {
-						toggleClass(button, 'success', false);
-						$this.toggleMenu($this.ui.updateMenu, false);
-					}, 1000);
-				} else {
-					alert(data);
-				}
+				try {
+					data = JSON.parse(data);
+					if (data.status == 'ok') {
+						var button = filterChildren($this.ui.updateMenu.element, 'save')[0];
+						toggleClass(button, 'success', true);
+						setTimeout(function() {
+							toggleClass(button, 'success', false);
+							$this.toggleMenu($this.ui.updateMenu, false);
+						}, 1000);
+					} else {
+						alert(data);
+					}
+				} catch(e) {}
 			},
 			complete: function(data) {
 			}
 		});
 	},
+	*/
 	lookupObject: function(indexKey) {
 		var crawl = function(object) {
 			if (typeof object === 'object') {
@@ -990,21 +995,23 @@ TodoController.prototype = {
 		this.lockChanges = true;
 		getAjax({
 			method: 'POST',
-			url: 'inbox.php?changes=' + encodeURIComponent(JSON.stringify(this.state.changes)),
+			url: 'api.php?action=inbox&changes=' + encodeURIComponent(JSON.stringify(this.state.changes)),
 			complete: function() {
 				$this.lockChanges = false;
 			},
 			success: function(data) {
-				if (data == 'ok') {
-					$this.state.changes = null;
-					$this.saveState();
-					toggleClass(button, 'success', true);
-					toggleClass(button, "changed", false);
-					setTimeout(function() {
-						toggleClass(button, 'success', false);
-					}, 1000);
-				} else {
-				}
+				try {
+					data = JSON.parse(data);
+					if (data.status == 'ok') {
+						$this.state.changes = null;
+						$this.saveState();
+						toggleClass(button, 'success', true);
+						toggleClass(button, "changed", false);
+						setTimeout(function() {
+							toggleClass(button, 'success', false);
+						}, 1000);
+					}
+				} catch(e) {}
 			}
 		});
 	},
