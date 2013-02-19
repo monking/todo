@@ -30,13 +30,13 @@ require_once('../config.php');
 			<table id="calendar">
 				<thead>
 					<tr>
+						<td>Sun</td>
 						<td>Mon</td>
 						<td>Tue</td>
 						<td>Wed</td>
 						<td>Thu</td>
 						<td>Fri</td>
 						<td>Sat</td>
-						<td>Sun</td>
 					</tr>
 				</thead>
 				<tbody id="calendar-body"></tbody>

@@ -230,7 +230,7 @@ TodoController.prototype = {
 			button.onclick = function() {
 				switch (this.attributes.name.value) {
 					case 'load':
-						$this.fetchData({ disk:true });
+						$this.loadUpdated();
 						break;
 					case 'save':
 						$this.flushChanges();
@@ -373,9 +373,11 @@ TodoController.prototype = {
 			74:  /* j     */ 'advanceMonth',
 			75:  /* k     */ 'reverseMonth',
 			76:  /* l     */ 'advanceDay',
-			84:  /* t     */ 'gotoToday'
+			84:  /* t     */ 'gotoToday',
+			85:  /* u     */ 'loadUpdated'
 		};
 		document.body.onkeydown = function(event) {
+			console.log(event.keyCode);
 			// ignore keys with modifiers
 			if (event.metaKey || event.altKey || event.shiftKey || event.ctrlKey)
 				return true;
@@ -472,6 +474,9 @@ TodoController.prototype = {
 				}
 			});
 		}
+	},
+	loadUpdated: function() {
+		this.fetchData({ disk:true });
 	},
 	/*
 	saveData: function() {
@@ -599,7 +604,7 @@ TodoController.prototype = {
 
 		var startDate = new Date(activeDate.getTime());
 		startDate.setDate(1); // start on first of the month
-		startDate = new Date(startDate.getTime() - 86400000 * ((startDate.getDay() + 6) % 7)); // start on the prior Monday
+		startDate = new Date(startDate.getTime() - 86400000 * (startDate.getDay() % 7)); // start on the prior Sunday
 		var firstTimestamp = Math.round(startDate.getTime() / 1000);
 
 		var markingActiveMonthDay = false;
