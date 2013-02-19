@@ -761,8 +761,8 @@ TodoController.prototype = {
 		this.updatePunch();
 	},
 	remind: function() {
-		var today, event, i, j, minutes, timeLeft, notificationId, isOpen;
-		var today = this.findDay(this.now);
+		var today, event, i, j, minutes, minutesDepart, timeLeft, departTime, notificationId, isOpen, title, message;
+		today = this.findDay(this.now);
 		if (!today.schedule) return;
 
 		for (i = 0; i < today.schedule.length; i++) {
@@ -773,6 +773,7 @@ TodoController.prototype = {
 				notificationId = event.tmpKey.toString() + "_" + j;
 				isOpen = (typeof this.notifications.open[notificationId] !== "undefined");
 				minutes = Math.ceil((event.start - this.uTime) / 60);
+				minutesDepart = Math.ceil((event.children[0].start - this.uTime) / 60);
 				if (!isOpen && minutes >= 0 && minutes * 60 <= event.remind[j]) {
 					if (minutes > 0) {
 						timeLeft = "in " + minutes + " min.";
@@ -781,7 +782,16 @@ TodoController.prototype = {
 					} else {
 						timeLeft = "NOW";
 					}
-					this.notify(notificationId, this.formatTime(new Date(event.start * 1000)) + ' - ' + event.name + " (" + timeLeft + ")", "Todo Event");
+					if (minutesDepart < 0 || minutesDepart >= minutes) {
+						departTime = "";
+					} else if (minutesDepart > 0) {
+						departTime = ", leave in " + minutesDepart + " min.";
+					} else {
+						departTime = ", leave NOW";
+					}
+					title = this.formatTime(new Date(event.start * 1000)) + " - " + event.name;
+					message = timeLeft + departTime;
+					this.notify(notificationId, message, title);
 					break;
 				}
 			}
