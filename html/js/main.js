@@ -536,7 +536,7 @@ TodoController.prototype = {
 		return crawl(this.data, indexKey);
 	},
 	markupSchedule: function(day, todayTime) {
-		var i, j, markup = '', event, classes, eventEnd, left, segment, width, nameLeft;
+		var i, j, k, markup = '', event, classes, eventEnd, left, segment, width, nameLeft, reminderTooltip;
 
 		if (!todayTime)
 			todayTime = day.time
@@ -562,7 +562,13 @@ TodoController.prototype = {
 				nameLeft = this.secondsToPixels(eventEnd - event.start);
 				markup += '<div class="name" style="left:' + nameLeft + 'px">';
 				if (typeof event.remind !== "undefined") {
-					markup += '<div class="icon remind"></div>';
+					reminderTooltip = "";
+					for (k = 0; k < event.remind.length; k++) {
+						if (k) reminderTooltip += ", ";
+						reminderTooltip += Math.ceil(event.remind[k] / 60);
+					}
+					reminderTooltip += " min.";
+					markup += '<div class="icon remind" title="' + reminderTooltip + '"></div>';
 				}
 				markup += this.formatTime(new Date(event.start * 1000)) + ' '
 							+ this.markupTags(event.name)
