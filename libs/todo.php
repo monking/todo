@@ -106,8 +106,6 @@ class Todo {
 	 */
 	private function parseLine(&$parent_object = null, $force_depth = null) { // stack should only be as deep as indent depth
 		$line = $this->lines[$this->line_num];
-		if (! $line)
-			return;
 
 		if ($force_depth === null) {
 			preg_match('/^\t+/', $line, $indent);
