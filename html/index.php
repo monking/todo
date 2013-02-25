@@ -3,8 +3,7 @@ $params = explode('/', preg_replace('@^/@', '', $_SERVER['REQUEST_URI']));
 require_once('../config.php');
 ?>
 <!DOCTYPE html>
-<!-- <html manifest="appcache.manifest"> -->
-<html>
+<html manifest="appcache.manifest">
 	<head>
 		<title>TODO</title>
 
