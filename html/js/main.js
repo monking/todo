@@ -961,7 +961,7 @@ TodoController.prototype = {
 			if (hours.length < 2) hours = '0' + hours;
 			var minutes = this.now.getMinutes().toString();
 			if (minutes.length < 2) minutes = '0' + minutes;
-			this.ui.tick.element.innerHTML = '<span class="current-time">' + hours + minutes + '</span';
+			this.ui.tick.element.innerHTML = '<span class="current-time">' + hours + ':' + minutes + '</span';
 			this.ui.tick.element.style.left = left + 'px';
 			this.ui.tick.element.style.display = 'block';
 		} else {

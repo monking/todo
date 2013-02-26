@@ -52,7 +52,7 @@ button{text-decoration:none;border:0px;padding:1em 0.3em;margin:0 0.2em;border-r
 .footer{width:100%;text-align:center;position:fixed;left:0;bottom:0;width:100%;height:70px;line-height:70px}
 .footer button{display:inline-block;vertical-align:middle}
 
-.current-time{background-color:inherit;font-size:250%;padding:0 0.5em;display:block;line-height:45px}
+.current-time{background-color:inherit;font-size:250%;padding:0 0.3em;display:block;line-height:45px}
 
 #menu-container{display:none;position:fixed;width:60%;height:100%;left:15%;top:0;overflow:auto;padding:5%}
 #menu-container,

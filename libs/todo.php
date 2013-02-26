@@ -143,8 +143,8 @@ class Todo {
 					$content = substr($content, 1);
 
 					$event = (object) array(// TODO: parse this data with ~1 RegExp pattern
-						'name' => preg_replace('/^.*?[x\~>?\| -]*(\d{4})?/', '', $content),
-						'start' => preg_replace('/^(.*? (\d{4}))?.*$/', '$2', $content),
+						'name' => preg_replace('/^.*?[x\~>?\| -]*(\d\d:?\d\d)?/', '', $content),
+						'start' => preg_replace('/^(.*? ((\d\d):?(\d\d)))?.*$/', '$3$4', $content),
 						'contains' => 'segment', // TODO: $hierarchies contains this type, but the structure is not linear, not using it yet
                         'children' => array(),
 					);
