@@ -639,11 +639,10 @@ TodoController.prototype = {
 			return markup;
 		};
 		var periods = [
-			this.data.children[0].children[4].children,
+			this.data.children[0].children[3].children,
 			this.data.children[0].children[0].children,
 			this.data.children[0].children[1].children,
-			this.data.children[0].children[2].children,
-			this.data.children[0].children[3].children
+			this.data.children[0].children[2].children
 		];
 		var list = [], listIndex = 0;
 		while(periods.length && ! list.length) {
@@ -853,11 +852,10 @@ TodoController.prototype = {
 	shiftDay: function(count) {
 		if (!count) return true;
 		var periods = [
-			this.data.children[0].children[4].children,
+			this.data.children[0].children[3].children,
 			this.data.children[0].children[0].children,
 			this.data.children[0].children[1].children,
-			this.data.children[0].children[2].children,
-			this.data.children[0].children[3].children
+			this.data.children[0].children[2].children
 		];
 
 		var advanceOne = function() {
@@ -919,11 +917,10 @@ TodoController.prototype = {
 	findDay: function(time) { // (Date)
 		var timestamp = Math.floor(time.getTime() / 1000),
 			periods = [
-				this.data.children[0].children[4].children,
+				this.data.children[0].children[3].children,
 				this.data.children[0].children[0].children,
 				this.data.children[0].children[1].children,
-				this.data.children[0].children[2].children,
-				this.data.children[0].children[3].children
+				this.data.children[0].children[2].children
 			];
 		var day;
 		for (var i = 0; i < periods.length; i++) {
