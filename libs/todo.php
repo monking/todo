@@ -23,23 +23,17 @@ class Todo {
 			array('project'),
 			array('task'),
 		),
+		'notes' => array(
+			array('section'),
+			array('subject')
+		),
 		'backlog' => array(
 			array('section'),
 			array('status'),
 			array('category'),
 			array('project'),
 			array('task'),
-		),
-		'notes' => array(
-			array('section'),
-			array('subject')
-		),
-		'inbox' => array(
-			array('section'),
-			null,
-			null,
-			array('task'),
-		),
+		)
 	);
 
 	/**

@@ -718,8 +718,8 @@ TodoController.prototype = {
 	},
 	markupInbox: function() {
 		var i, j, markup = '';
-		if (this.data.children[4].hasOwnProperty('children')) {
-			var inbox = this.data.children[4].children;
+		if (this.data.children[2].children[3].hasOwnProperty('children')) {
+			var inbox = this.data.children[2].children[3].children;
 			for (i = 0; i < inbox.length; i++) {
 				markup += this.markupTask(inbox[i]);
 			}
@@ -1053,7 +1053,7 @@ TodoController.prototype = {
 
 		toggleClass(this.ui.updateButton.element, 'changed', true);
 		$this.queueChange('inbox', task);
-		$this.data.children[4].children.push({name: task});
+		$this.data.children[2].children[3].children.push({name: task});
 		$this.draw();
 		$this.flushChanges();
 	},
