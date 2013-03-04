@@ -146,15 +146,15 @@ class Todo {
 						self::checkTimezone($content);
 						$event->start = date_timestamp_get(DateTime::createFromFormat('d-m-Y Hi', $parent_object->date . ' ' . $event->start));
 					}
-					preg_match('/ !([0-9,]+)/', $event->name, $reminders);
+					preg_match('/ +!\[?([0-9,]+)/', $event->name, $reminders);
 					if ($reminders) {
+						$event->name = preg_replace('/ +!\d+(,\d+)*/', '', $event->name);
 						$reminders = explode(',', $reminders[1]);
 						$event->remind = array();
 						foreach($reminders as $reminder) {
 							$event->remind[] = intval($reminder) * 60;
 						}
 					}
-					$event->name = preg_replace('/ !\d+(,\d+)*/', '', $event->name);
                     preg_match('/^.*?[|x\~>?][|x\~>? -]*/', $content, $segments);
                     if ($segments) {
                         $segments = substr($segments[0], 1); // drop leading space in formatting
