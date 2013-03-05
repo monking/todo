@@ -144,7 +144,7 @@ class Todo {
 					);
 					if ($event->start) {
 						self::checkTimezone($content);
-						$event->start = date_timestamp_get(DateTime::createFromFormat('d-m-Y Hi', $parent_object->date . ' ' . $event->start));
+						$event->start = date_timestamp_get(DateTime::createFromFormat('Y-m-d Hi', $parent_object->date . ' ' . $event->start));
 					}
 					preg_match('/ +!\[?([0-9,]+)/', $event->name, $reminders);
 					if ($reminders) {
@@ -222,8 +222,8 @@ class Todo {
 				'contains' => $contains[0],
 			);
 			if ($object->type == 'date') {
-				$object->date = preg_replace('/^.*(\d{2}-\d{2}-\d{4}).*$/', '$1', $content);
-				$object->time = date_timestamp_get(DateTime::createFromFormat('d-m-Y Hi', $object->date . ' 0000'));
+				$object->date = preg_replace('/^.*(\d{4}-\d{2}-\d{2}).*$/', '$1', $content);
+				$object->time = date_timestamp_get(DateTime::createFromFormat('Y-m-d Hi', $object->date . ' 0000'));
 				self::checkTimezone($content);
 			}
 			if ($status) $object->status = $status;
