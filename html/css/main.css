@@ -115,7 +115,7 @@ body.dark{background-color:#222;color:#FFF}
 .dark .hold{color:#666}
 .dark .maybe{color:#97B}
 .dark .note{color:#EAA}
-.dark .urgent{color:#FCC}
+.dark .urgent{color:#F33}
 .dark .canceled{color:#666;text-decoration:line-through}
 .dark #tick{color:#0CF;border-color:#0CF}
 .dark .current-time{background-color:#000}
@@ -215,7 +215,7 @@ body.black{background-color:#000;color:#FFF}
 .black .hold{color:#666}
 .black .maybe{color:#97B}
 .black .note{color:#EAA}
-.black .urgent{color:#FCC}
+.black .urgent{color:#F33}
 .black .canceled{color:#666;text-decoration:line-through}
 .black #tick{color:#0CF;border-color:#0CF}
 .black .current-time{background-color:#000}

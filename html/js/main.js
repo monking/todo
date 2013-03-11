@@ -618,7 +618,7 @@ TodoController.prototype = {
 			var markup = '';
 			if (day) {
 				var date = new Date(day.time * 1000);
-				var note = day.name.replace(/^\d\d-\d\d-\d{4} [A-z]{3}( - )?/, '');
+				var note = day.name.replace(/^\d{4}-\d\d-\d\d [A-z]{3}( - )?/, '');
 
 				markingActiveMonthDay = (activeMonth == date.getMonth());
 				var classes = ['calendar-date'];
@@ -859,7 +859,7 @@ TodoController.prototype = {
 		];
 
 		var advanceOne = function() {
-			if (! periods[4].length) {
+			if (! periods[3].length) {
 				return false;
 			}
 			for (var i = 0; i < periods.length - 1; i++) {
@@ -1103,9 +1103,9 @@ TodoController.prototype = {
 		} else if (!date.getTime) {
 			date = new Date(date)
 		}
-		return date.getDate().toString().pad(2, 0)
-			+ '-' + date.getMonth().toString().pad(2, 0)
-			+ '-' + date.getFullYear().toString();
+		return date.getFullYear().toString()
+			+ '-' + (date.getMonth() + 1).toString().pad(2, 0)
+			+ '-' + date.getDate().toString().pad(2, 0);
 	}
 };
 
