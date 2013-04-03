@@ -932,6 +932,7 @@ TodoController.prototype = {
 		}
 	},
 	updateSchedule: function() {
+		var docTimezoneOffset = -7 * 3600;
 		var today = this.data.children[0].children[0].children[0];
 		var $events = document.getElementsByClassName('event');
 		var i, j;
@@ -953,7 +954,9 @@ TodoController.prototype = {
 		}
 
 		if (Math.abs(this.now - (today.time + 86400) * 1000) < 86400000) { // within 24 hours of midnight
-			var left = this.secondsToPixels(now - today.time);
+			var offset = -docTimezoneOffset - new Date().getTimezoneOffset() * 60;
+			console.log(offset / 3600);
+			var left = this.secondsToPixels(now - today.time + offset);
 			var hours = this.now.getHours().toString();
 			if (hours.length < 2) hours = '0' + hours;
 			var minutes = this.now.getMinutes().toString();
