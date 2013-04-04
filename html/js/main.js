@@ -536,7 +536,7 @@ TodoController.prototype = {
 		return crawl(this.data, indexKey);
 	},
 	markupSchedule: function(day, todayTime) {
-		var i, j, k, markup = '', event, classes, eventEnd, left, segment, width, nameLeft, reminderTooltip;
+		var i, j, k, markup = '', event, classes, duration, durationFormatted, eventEnd, left, segment, width, nameLeft, reminderTooltip;
 
 		if (!todayTime)
 			todayTime = day.time
@@ -553,9 +553,14 @@ TodoController.prototype = {
 					+ '">';
 				for (j = 0; j < event.children.length; j++) {
 					segment = event.children[j];
+					duration = segment.end - segment.start;
 					left = this.secondsToPixels(segment.start - event.start);
-					width = this.secondsToPixels(segment.end - segment.start);
-					markup += '<div class="segment ' + segment.type + '"'
+					width = this.secondsToPixels(duration);
+					durationFormatted = (duration < 3600?
+						Math.floor(duration / 60) + " min.":
+						Math.floor(duration / 3600) + " hrs."
+					);
+					markup += '<div class="segment ' + segment.type + '" title="' + durationFormatted + '"'
 						+ ' style="left:' + left + 'px;width:' + width + 'px"'
 						+ ' start="' + segment.start + '" end="' + segment.end + '"><div class="remaining"></div></div>'
 				}
