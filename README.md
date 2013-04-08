@@ -1,5 +1,5 @@
-Todo
-====
+Todo v0.1
+=========
 
 A todo list manager for online/offline use in modern web browsers, based loosely on GTD principles.
 
