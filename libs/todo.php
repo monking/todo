@@ -41,15 +41,16 @@ class Todo {
 	 */
 	public static $status_key = array(
 		'|' => 'comment',
-		'--' => 'next',
-		'==' => 'now',
-		'__' => 'paused',
+		'__' => 'normal',
+		'==' => 'next',
+		'))' => 'now',
+		'((' => 'paused',
 		'//' => 'done',
 		'..' => 'hold',
 		'xx' => 'canceled',
 		'??' => 'question',
 		'!!' => 'urgent',
-		'::' => 'note',
+		'##' => 'note'
 	);
 
 	/**
@@ -57,11 +58,12 @@ class Todo {
 	 */
 	public static $event_key = array(
 		'>' => 'to',
+		'<' => 'to',
 		'~' => 'to',
 		'|' => 'busy',
 		'?' => 'maybe',
 		'x' => 'canceled',
-		'-' => true, // a special type, continues whatever comes before
+		'-' => true // a special type, continues whatever comes before
 	);
 
 	public $data,
@@ -120,7 +122,7 @@ class Todo {
 		if ($line_depth == 0) {
 			$this->section = $content;
 		}
-		$status_mark = preg_replace('/^(\||[=_\/:x\.!?-]{2})?.*/', '$1', $content);
+		$status_mark = preg_replace('/^(\||[=_()\/:x\.!?-]{2})?.*/', '$1', $content);
 		if ($status_mark) {
 			$status = self::$status_key[$status_mark];
 			$content = substr($content, strlen($status_mark)); // remove space after status mark
