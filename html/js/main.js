@@ -693,8 +693,13 @@ TodoController.prototype = {
 			markup += '<div class="tasks">'
 			for (i = 0; i < day.children.length; i++) {
 				var project = day.children[i];
-				markup += '<div class="project">'
+				markup += '<div class="project collapsed">'
 					+ this.markupTags(project.name);
+				if (project.hasOwnProperty('comment')) {
+					markup += '<pre class="comment">'
+						+ this.markupTags(project.comment)
+						+ '</pre>'; // end comment
+				}
 				if (project.hasOwnProperty('children')) {
 					for (j = 0; j < project.children.length; j++) {
 						markup += this.markupTask(project.children[j]);
@@ -839,16 +844,22 @@ TodoController.prototype = {
 	setupComments: function() { // would be private
 		// toggle comments
 		var $this = this,
-			$task = document.getElementsByClassName('task');
-		for (var i = 0; i < $task.length; i++) {
-			$task[i].onclick = function(event) {
-				if (/^[aA]$/.test(event.target.tagName) || /\b(tag|link)\b/.test(event.target.className)) {
-					return true;
-				} else {
-					toggleClass(this, 'collapsed');
-					$this.saveState({body: true});
-				}
+			$projects = document.getElementsByClassName('project'),
+			$tasks = document.getElementsByClassName('task');
+		function onCommentClick(event) {
+			if (/^[aA]$/.test(event.target.tagName) || /\b(tag|link)\b/.test(event.target.className)) {
+				return true;
+			} else {
+				toggleClass(this, 'collapsed');
+				$this.saveState({body: true});
+				event.stopImmediatePropagation();
 			}
+		}
+		for (var i = 0; i < $tasks.length; i++) {
+			$tasks[i].onclick = onCommentClick;
+		}
+		for (var i = 0; i < $projects.length; i++) {
+			$projects[i].onclick = onCommentClick;
 		}
 	},
 	checkRollover: function() { // check if the schedule needs to advance to the next day, and do it
@@ -1001,7 +1012,9 @@ TodoController.prototype = {
 	},
 	markupTags: function(string) {
 		// string = string.replace(/\b([#@]([a-zA-Z][a-zA-Z0-9_]+))/g, '<span class="tag $2">$1</span>');
-		string = string.replace(/([#@]([a-zA-Z][a-zA-Z0-9_-]+))/g, '<span class="tag $2">$1</span>');
+		string = string.replace(/([#@]([a-zA-Z][a-zA-Z0-9_-]+))/g, function(matches, full, tag){
+			return '<span class="tag ' + tag.toLowerCase() + '">' + full + '</span>';
+		});
 		string = string.replace(/(https?:\/\/[^\s]*)/g, '<a href="$1" target="_blank">$1</a>');
 		string = string.replace(/((\+?1[ -])?\(?[0-9][0-9+) -]{9,13})/g, '<a href="tel:$1">$1</a>');
 		return string;
