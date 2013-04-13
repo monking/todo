@@ -19,7 +19,7 @@ body{margin:0;padding:20px 10px 120px 10px;background-color;#000}
 .opt-group label { display: block; }
 /* *{;-webkit-text-size-adjust:none} /* TODO: fix text scaling on iPhone more specifically */
 .collapsed{position:relative}
-.collapsed .comment{position:absolute;top:0.2em;left:-1em;overflow:hidden;width:0.5em;height:1em;text-indent:-9999em;cursor:pointer;margin:0;padding:0}
+.collapsed > .comment{position:absolute;top:0.2em;left:-1em;overflow:hidden;width:0.5em;height:1em;text-indent:-9999em;cursor:pointer;margin:0;padding:0}
 .tag{cursor:pointer}
 
 .icon{background-size:8px;display:inline-block}

@@ -5,6 +5,58 @@ v0.1.1
 2013-04-08
 
 
+Overall Format
+--------------
+
+Version 0.1.1 of this format is a shift away from the rigid Vim Outliner format
+toward the more readable Markdown format. Markdown is not inherently
+hierarchical, so basic structure is denoted with headers and keywords, while
+further data is implicit or extracted by formatting (such as date). 
+
+Below is an example todo document format in use.
+
+	Calendar
+	========
+	
+	## Today
+	
+	2013-04-07 Sunday (PST)
+	
+	| . . : . . | . . : . . | . . : . . | . . : . . | . . : . . 
+	                  >|------  |-------- @hspot
+					          |- @lunch
+							             >|< @market
+	
+	@home
+	// 8:00 take out the garbage  !5
+
+	@hspot
+	// layout homepage
+	== markup navigation
+	xx 15:00 give demonstration
+	__ implement framework
+	?? hi-res version
+
+	@market
+	__ bananas
+	__ almonds
+	__ eggs
+	?? cookies
+
+	@home
+	__ bathe the dog
+	
+	## 10 Days
+
+	2013-04-08 Monday (PST)
+
+
+	@home
+	__ fix faucet
+
+
+
+
 Brief review of v0.1.0
 ----------------------
 
@@ -70,55 +122,3 @@ and a 1hr "maybe" segment).
 - Travel: symbol "~" or ">"
 - Cancelled: symbol "x"
 - Maybe: symbol "?"
-
-
-Overall Format
-==============
-
-Version 0.1.1 of this format is a shift away from the rigid Vim Outliner format
-toward the more readable Markdown format. Markdown is not inherently
-hierarchical, so basic structure is denoted with headers and keywords, while
-further data is implicit or extracted by formatting (such as date). 
-
-Below is an example todo document format in use.
-
-	Calendar
-	========
-	
-	## Today
-	
-	2013-04-07 Sunday (PST)
-	
-	| . . : . . | . . : . . | . . : . . | . . : . . | . . : . . 
-	                  >|------  |-------- @hspot
-					          |- @lunch
-							             >|< @market
-	
-	@home
-	// 8:00 take out the garbage  !5
-
-	@hspot
-	// layout homepage
-	== markup navigation
-	xx 15:00 give demonstration
-	__ implement framework
-	?? hi-res version
-
-	@market
-	__ bananas
-	__ almonds
-	__ eggs
-	?? cookies
-
-	@home
-	__ bathe the dog
-	
-	## 10 Days
-
-	2013-04-08 Monday (PST)
-
-
-	@home
-	__ fix faucet
-
-
