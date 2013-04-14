@@ -41,9 +41,10 @@ class Todo {
 	 */
 	public static $status_key = array(
 		'|' => 'comment',
+		'__' => 'normal',
 		'--' => 'next',
 		'==' => 'now',
-		'__' => 'paused',
+		'##' => 'paused',
 		'//' => 'done',
 		'..' => 'hold',
 		'xx' => 'canceled',
