@@ -1,0 +1,139 @@
+#!/bin/bash
+man="
+todogen - generates a list of dates up to a year in the future
+
+USAGE: todogen [-d startdate][-qh]
+
+OPTIONS
+    -d  Date to start from, in any format the GNU 'date' command
+        understands (uses coreutils gdate if present)
+
+    -q  Omit structural lines (--TODAY--, etc.)
+
+    -h  Show this help info
+"
+while getopts "d:qh" flag
+do
+	case $flag in
+		d ) startdate="$OPTARG ";;
+		h ) echo "$man"
+			exit 0;;
+		q ) nostructure="y";;
+	esac
+done
+shift $((OPTIND-1)); OPTIND=1
+if [ "$1" = "help" ]; then
+	echo "$man"
+	exit 0
+fi
+if [ "$nostructure" != "y" ]; then
+	echo "SCHEDULE"
+fi
+daysfuture=0
+usegdate=n
+if [ -a "$(command -v gdate)" ]; then
+	usegdate=y
+fi
+while [ $daysfuture -lt 365 ]; do
+	if [ "$usegdate" = "y" ]; then
+		day="$(gdate -d "$startdate+$daysfuture days" "+%d")"
+		month="$(gdate -d "$startdate+$daysfuture days" "+%m")"
+		weekday="$(gdate -d "$startdate+$daysfuture days" "+%a")"
+		year="$(gdate -d "$startdate+$daysfuture days" "+%Y")"
+	else
+		day="$(date -d "$startdate+$daysfuture days" "+%d")"
+		month="$(date -d "$startdate+$daysfuture days" "+%m")"
+		weekday="$(date -d "$startdate+$daysfuture days" "+%a")"
+		year="$(date -d "$startdate+$daysfuture days" "+%Y")"
+	fi
+	thedate="$year-$month-$day"
+	note=""
+	# special dates by date
+	case "$thedate" in
+		"01-01") note=" - New Year's Day";;
+		"01-27") note=" - Dad's Birthday (`echo $(($year-1962))`)";;
+		"02-02") note=" - Groundhog Day";;
+		"02-29") note=" - Leap Day";;
+		"03-24") note=" - Mom's Birthday (`echo $(($year-1961))`)";;
+		"04-03") note=" - Brina's Birthday (`echo $(($year-1986))`)";;
+		"04-15") note=" - tax day";;
+		"04-22") note=" - Earth Day";;
+		"04-28") note=" - Dawson's Birthday (`echo $(($year-1988))`)";;
+		"07-04") note=" - Independence Day (US - `echo $(($year-1776))`)";;
+		"08-03") note=" - Austin's Birthday (`echo $(($year-1984))`)";;
+		"09-06") note=" - Omama's Birthday (`echo $(($year-1934))`)";;
+		"09-07") note=" - David's Birthday (`echo $(($year-1980))`)";;
+		"09-20") note=" - Mom & Dad's Anniversary (`echo $(($year-1982))`)";;
+		"10-01") note=" - Chase's Birthday (`echo $(($year-1984))`)";;
+		"10-31") note=" - Halloween";;
+		"11-26") note=" - Luisa's Birthday (`echo $(($year-1988))`)";;
+		"12-25") note=" - Christmas Day";;
+		"12-31") note=" - New Year's Eve";;
+	esac
+	# special dates by Nth weekday of the month
+	dayNum=$(echo $day | perl -pe 's/^0+//')
+	nthWeekdayRemainder=$(($dayNum  % 7 ))
+	nthWeekday=$(($dayNum / 7))
+	if [ $nthWeekdayRemainder -gt 0 ]; then
+		nthWeekday=$(($nthWeekday + 1))
+	fi
+	case "$month $weekday $nthWeekday" in
+		"03 Sun 2") note="$note - Start Daylight Savings Time";;
+		"05 Sun 2") note="$note - Mother's Day";;
+		"06 Sun 3") note="$note - Father's Day";;
+		"11 Sun 1") note="$note - End Daylight Savings Time";;
+		"11 Tue 1") note="$note - Election Day (US)";;
+		"11 Sun 2") note="$note - Veterans Day";;
+		"11 Thu 4") note="$note - Thanksgiving Day (US)";;
+	esac
+	
+	if [ "$nostructure" != "y" ]; then
+		if [ $daysfuture -eq 0 ]; then
+			echo "	--TODAY--"
+		elif [ $daysfuture -eq 1 ]; then
+			echo "	--30 DAYS--"
+		elif [ $daysfuture -eq 31 ]; then
+			echo "	--LEAD--"
+			echo "	--PAST--"
+		fi
+	fi
+	echo "		$thedate $weekday$note"
+	daysfuture=$(($daysfuture+1))
+done
+if [ "$nostructure" != "y" ]; then
+	echo "NOTES
+	KEY
+		Date
+		|_| . . : . . | . . : . . | . . : . . | . . : . . | . . : . . 
+		|                   |----- 0900 3hr event
+		|                         >-|--- 1300 1hr travel to 2hr event
+		|                          ~~ 1230 tilde can also show travel
+		|                               x     | 1800 rescheduled from 1500
+		|                                 |-      |- 1600 split into 2 x 1hr segments
+		|                            ?---- an event which may happen
+			3rd INDENT: Project
+				4th INDENT: Task
+			Prefix Markers
+				-- next: don't push back if you can help it
+				== in progress
+				__ paused, incomplete
+				.. waiting, or stalled
+				// finished
+				xx cancelled
+				:: comment...LOOK AT ME!!
+				?? question / uncertain
+			Task Name
+			| the meaning of _tag_ and _context_ are up to interpretation
+				#tag
+				@context
+		Timezones
+			TZ > America/Los_Angeles
+			TZ > Asia/Seoul
+			TZ > Asia/Hong_Kong
+			TZ > Asia/Ho_Chi_Minh
+			TZ > Asia/Tokyo
+			TZ > Europe/Zagreb
+			TZ > America/New_York
+			TZ > Pacific/Honolulu"
+	echo "BACKLOG"
+fi
