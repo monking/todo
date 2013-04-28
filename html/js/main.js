@@ -1016,7 +1016,7 @@ TodoController.prototype = {
 			return '<span class="tag ' + tag.toLowerCase() + '">' + full + '</span>';
 		});
 		string = string.replace(/(https?:\/\/[^\s]*)/g, '<a href="$1" target="_blank">$1</a>');
-		string = string.replace(/((\+?1[ -])?\(?[0-9][0-9+) -]{9,13})/g, '<a href="tel:$1">$1</a>');
+		string = string.replace(/((\+?1[ -])?\(?[0-9]{3}(\) |-|.)[0-9]{3}[-.][0-9]{4})/g, '<a href="tel:$1">$1</a>');
 		return string;
 	},
 	switchStyle: function(style) {

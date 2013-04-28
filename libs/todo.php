@@ -43,8 +43,8 @@ class Todo {
 		'|' => 'comment',
 		'__' => 'normal',
 		'==' => 'next',
-		'))' => 'now',
-		'((' => 'paused',
+		'>>' => 'now',
+		'::' => 'paused',
 		'//' => 'done',
 		'..' => 'hold',
 		'xx' => 'canceled',
@@ -122,10 +122,10 @@ class Todo {
 		if ($line_depth == 0) {
 			$this->section = $content;
 		}
-		$status_mark = preg_replace('/^(\||[=_()\/:x\.!?-]{2})?.*/', '$1', $content);
+		$status_mark = preg_replace('/^(\||[=_>\/:x\.!?]{2})?.*/', '$1', $content);
 		if ($status_mark) {
 			$status = self::$status_key[$status_mark];
-			$content = substr($content, strlen($status_mark)); // remove space after status mark
+			$content = substr($content, strlen($status_mark)); // remove status mark and following space
 		} else {
 			$status = null;
 		}
