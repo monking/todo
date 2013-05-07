@@ -44,7 +44,7 @@ body{margin:0;padding:20px 10px 120px 10px;background-color;#000}
     50% {opacity: 1.0}
     100% {opacity: 0.8}
 }
-.comment{text-indent:0;margin:0.5em 0}
+.comment{text-indent:0;margin:0.5em 0;cursor:pointer}
 
 button{text-decoration:none;border:0px;padding:1em 0.3em;margin:0 0.2em;border-radius:0.5em;font-size:140%;cursor:pointer;border:3px solid;text-align:center}
 .disabled{opacity:0.3}
