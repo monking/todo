@@ -48,7 +48,8 @@ case 'save':
 		handleException('empty', 'no data to save');
 	}
 
-	$todo->data = json_decode( str_replace( '\\\\', '\\', $_POST['data'] ) );
+	$json_data = str_replace('\\\\', '\\', $_POST['data']);
+	$todo->data = json_decode($json_data);
 	$todo->saveJSON();
 	$todo->saveOTL();
 	echo json_encode(array('status' => 'ok'));

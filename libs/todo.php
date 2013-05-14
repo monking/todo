@@ -39,7 +39,7 @@ class Todo {
 	/**
 	 * a key to translate the status prefixes on tasks
 	 */
-	public static $status_key = array(
+	public static $status_keys = array(
 		'|' => 'comment',
 		'__' => 'normal',
 		'==' => 'next',
@@ -53,18 +53,21 @@ class Todo {
 		'##' => 'note'
 	);
 
+	public static $status_codes = array();
+
 	/**
 	 * a key to translate marks in the schedule
 	 */
 	public static $event_key = array(
+		'~' => 'while',
 		'>' => 'to',
-		'<' => 'to',
-		'~' => 'to',
+		'<' => 'from',
 		'|' => 'busy',
 		'?' => 'maybe',
-		'x' => 'canceled',
-		'-' => true // a special type, continues whatever comes before
+		'x' => 'canceled'
 	);
+
+	public static $event_codes = array();
 
 	public $data,
 		$user;
@@ -76,9 +79,11 @@ class Todo {
 		$depth,
 		$section;
 
-	public function __construct($options = null) {
+	public function __construct($options = array()) {
 		if (!isset($options['user']))
 			die('No username given');
+		self::$status_codes = array_flip(self::$status_keys);
+		self::$event_codes = array_flip(self::$event_key);
 		
 		$this->user = $options['user'];
 	}
@@ -124,7 +129,7 @@ class Todo {
 		}
 		$status_mark = preg_replace('/^(\||[=_>\/:x\.!?]{2})?.*/', '$1', $content);
 		if ($status_mark) {
-			$status = self::$status_key[$status_mark];
+			$status = self::$status_keys[$status_mark];
 			$content = substr($content, strlen($status_mark)); // remove status mark and following space
 		} else {
 			$status = null;
@@ -171,17 +176,18 @@ class Todo {
 						}
 						if ($start_offset === false) return; // no start time, don't parse this line
 
-                        if (! $event->start) {
+                        if (!$event->start) {
 							$event->start = $parent_object->time + ($start_offset / 2) * 3600;
 						}
                         $prev_type = null;
                         for ($step = 0; $step <= strlen($segments); $step++) {
 							if ($step == strlen($segments)) {
 								$type = null;
+							} else if ('-' === substr($segments, $step, 1)) {
+								$type = $type = $prev_type;
 							} else {
 								$type = @self::$event_key[substr($segments, $step, 1)];
 							}
-                            if ($type === true) $type = $prev_type;
                             if ($type !== $prev_type) {
 								$step_time = $event->start + ($step - $start_offset) / 2 * 3600;
                                 if ($prev_type && !empty($event->children)) {
@@ -281,15 +287,81 @@ class Todo {
 	}
 
 	/**
-	 * encode JSON object as OTL document
+	 * encode a period of time in text
+	 * @segment stdClass with the following properties
+	 * 	->start int timestamp, NULL assumes 00:00 on the date of ->end
+	 * 	->end int timestamp
+	 * 	->type string name of the segment type, NULL for spaces
+	 * @timezone string name of the timezone
 	 */
-	private function encodeOTL($object, $type = 'todo') {
-		$otl = $indent . $object->name;
-		
-		if (isset($object->comment)) {
-			$otl .= preg_replace('/(^|\n)/m', '| $1', $object->comment);
+	private function textSegment($segment, $timezone = 'America/Los_Angeles') {
+		date_default_timezone_set($timezone);
+		$end_half_hours = date('G', $segment->end) * 2 + round(date('i', $segment->end) / 30);
+		if ($segment->start === NULL) {
+			$start_half_hours = 0;
+		} else {
+			$start_half_hours = date('G', $segment->start) * 2 + round(date('i', $segment->start) / 30);
 		}
+		if ($start_half_hours > $end_half_hours) {
+			$end_half_hours += 48;
+		}
+		$type_code = ($segment->type === NULL ? ' ' : self::$event_codes[$segment->type]);
+		$duration_half_hours = $end_half_hours - $start_half_hours - 1;
+		if ($duration_half_hours < 1) {
+			$duration = '';
+		} else {
+			$duration = str_repeat(($segment->type === NULL ? ' ' : '-'), $duration_half_hours);
+		}
+		return $type_code . $duration;
+	}
 
+	/**
+	 * encode object as OTL document
+	 */
+	private function encodeOTL($object, $indent = '') {
+		$otl = $indent;
+		if (isset($object->status)) {
+			$otl .= self::$status_codes[$object->status];
+		}
+		if (isset($object->name)) {
+			$otl .= $object->name;
+		}
+		$otl .= "\n";
+		if (isset($object->schedule)) {
+			$otl .= $indent . '|_| . . : . . | . . : . . | . . : . . | . . : . . | . . : . .' . "\n";
+			foreach ($object->schedule as $event) {
+				$otl .= $indent . '| ';
+				$last_end_time = NULL;
+				foreach ($event->children as $segment) {
+					if ($segment->start !== $last_end_time) {
+						$otl .= $this->textSegment((object) array(
+							'start' => $last_end_time,
+							'end' => $segment->start,
+							'type' => NULL
+						));
+					}
+					$last_end_time = $segment->end;
+					$otl .= $this->textSegment($segment);
+				}
+				$otl .= ' ' . date('H:i', $event->start) . ' ' . $event->name;
+				if (isset($event->remind)) {
+					$reminders = array();
+					foreach ($event->remind as $seconds) {
+						$reminders[] = intval($seconds / 60);
+					}
+					$otl .= '  !' . implode(',', $reminders);
+				}
+				$otl .= "\n";
+			}
+		}
+		if (isset($object->comment)) {
+			$otl .= $indent . '|' . preg_replace('/\n/m', "\n$indent|", $object->comment);
+			$otl .= "\n";
+		}
+		if (isset($object->children)) { foreach ($object->children as $object) {
+				$otl .= $this->encodeOTL($object, $indent . "\t");
+			}
+		}
 		return $otl;
 	}
 
@@ -297,8 +369,11 @@ class Todo {
 	 * encode and save data in Vim Outliner format
 	 */
 	public function saveOTL() {
-		// $otl = $this->encodeOTL();
-		// file_put_contents($otl, $this->user->dir . '/todo.otl');
+		$otl = '';
+		foreach ($this->data->children as $object) {
+			$otl .= $this->encodeOTL($object, '');
+		}
+		file_put_contents($this->user->dir . '/todo.otl', $otl);
 	}
 
 	/**
@@ -320,6 +395,7 @@ class Todo {
 	public function saveJSON() {
 		$file_path = $this->user->dir . '/todo.json';
 		file_put_contents($file_path, json_encode($this->data));
+		readfile($file_path);
 	}
 
 	/**
