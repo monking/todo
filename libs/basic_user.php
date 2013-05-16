@@ -78,8 +78,8 @@ class BasicUser {
 	}
 
 	public function loadSettings() {
-		$this->dir = $this->user_dir . '/' . $this->username;
-		$this->settings_file = $this->dir . '/settings.json';
+		$this->dir = $this->user_dir . DS . $this->username;
+		$this->settings_file = $this->dir . DS . 'settings.json';
 		if (file_exists($this->settings_file)) {
 			$this->settings = json_decode(file_get_contents($this->settings_file));
 		} else {
