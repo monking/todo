@@ -20,6 +20,7 @@ require_once('../config.php');
 		<meta name="robots" content="noindex, nofollow" />
 		<!-- <link href="http://fonts.googleapis.com/css?family=Droid+Sans+Mono" rel="stylesheet" type="text/css"> -->
 		<link href="css/main.css" rel='stylesheet' type='text/css'>
+		<script type="text/javascript" src="js/vendor/jquery-2.0.0.min.js"></script>
 		<script type="text/javascript" src="js/main.js"></script>
 	</head>
 	<body class="dark">

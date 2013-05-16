@@ -1,57 +1,58 @@
-// XHR
-window.getAjax = function(options) {
-	var request = new XMLHttpRequest();
-	if (!options) options = {};
-	options.extends({
-		url:	  null,
-		method:   'GET',
-		data:     '',
-		async:	  true,
-		complete: null,
-		success:  null
-	});
-	if (!options.url) {
-		if (typeof options.complete === 'function') {
-			options.complete(false);
-		}
-		return false;
-	}
-	request.open(options.method, options.url, options.async);
-	request.onreadystatechange = function() {
-		if (request.readyState == 4) {
-			var data = null;
-			if (request.status == 200 && typeof options.success === 'function') {
-				data = request.responseText;
-				options.success(data);
-			}
-			if (typeof options.complete === 'function') {
-				options.complete(data);
-			}
-		}
-	}
-	if (options.method === 'POST' && options.data) {
-		request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-		request.setRequestHeader('Content-length', options.data.length);
-		request.setRequestHeader('Connection', 'close');
-		request.send(options.data);
-	} else {
-		request.send();
-	}
-};
+/*
+ * author: Christopher Lovejoy <lovejoy.chris@gmail.com>
+ * copyright 2013 under an Attribution Creative Commons license
+ * http://creativecommons.org/licenses/by/3.0
+ */
 
-// extends
-if (!Object.prototype.extends) { // BUG: when used, this method is included in the loop and added as a property
-	Object.prototype.extends = function(parent, overwrite) {
-		if (this) {
-			for (var key in parent) {
-				if (!this.hasOwnProperty(key) || overwrite)
-					this[key] = parent[key];
-			}
-		} else {
-			this = parent;
+/*
+ * Takes any number of arguments. Behaves differently for Functions and all
+ * other Objects.
+ *
+ * Each Function argument inherits its next argument as its new prototype, and
+ * the `_super` property is added as a reference to that parent function. All
+ * but the last argument will be altered.
+ *
+ * Object arguments are layered onto the first argument so that earlier
+ * arguments take precedent, and only the first argument is altered.
+ */
+function Extends() {
+	var i, len;
+	len = arguments.length;
+	if (typeof arguments[0] === "function") {// affects all arguments
+		for (i = len - 1; i >= 1; i--) {
+			Extends.prototype.inheritFunction(arguments[i-1], arguments[i]);
+		}
+	} else {
+		for (i = 1; i < len; i++) {// affects only the first argument
+			arguments[0] = Extends.prototype.inheritObject(arguments[0], arguments[i]);
 		}
 	}
+	return arguments[0];
 }
+Extends.prototype.inheritFunction = function(_child, _parent) {
+	_child.prototype = new _parent();
+	_child.prototype.constructor = _child;
+	_child.prototype._super = _parent;
+	_child.prototype._doSuper = function(methodName, args) {
+		_parent.prototype[methodName].apply(this, args);
+	};
+	_child.prototype._superName = function() {
+		return this._super.toString().replace(/^function ([^\(]+)(.|\s|\r|\n)*/, "$1");
+	};
+	return _child;
+};
+Extends.prototype.inheritObject = function(_child, _parent) {
+	if (typeof _child === "undefined") {
+		_child = _parent;
+	} else {
+		var key;
+		for (key in _parent) {
+			if (typeof _child[key] === "undefined")
+				_child[key] = _parent[key];
+		}
+	}
+	return _child;
+};
 
 // String.pad
 if (!String.prototype.pad) {
@@ -63,43 +64,19 @@ if (!String.prototype.pad) {
 }
 
 // toggleClass
-var toggleClass = function(element, className, override) {
-	var added = override,
-		classes = element.className.match(/([^\s]+)/g) || [],
-		classIndex = classes.indexOf(className);
-
-	if (classIndex > -1) {
-		if (!override) {
-			classes.splice(classIndex, 1);
-			added = false;
-		}
-	} else if (override !== false) {
-		classes.push(className);
-		added = true;
+$.fn.toggleClass = function(className, add) {
+	if (typeof add === "undefined") {
+		add = !this.hasClass(className);
 	}
-	if (typeof added !== 'undefined')
-		element.className = classes.join(' ');
-	return added;
+	add ? this.addClass(className) : this.removeClass(className);
+	return this;
 };
-
-// filterChildren
-var filterChildren = function(element, className) {
-	var pattern = new RegExp('\\b' + className.replace(/, ?/, '\\b|\\b').replace(/ +/, '\\b.*\\b') + '\\b');
-	var matches = [];
-	for (var i = 0; i < element.children.length; i++) {
-		var child = element.children[i];
-		if (pattern.test(child.className)) {
-			matches.push(child);
-		}
-	}
-	return matches;
-}
 
 // Controller
 var TodoController = function() {};
 TodoController.prototype = {
 	init: function() {
-		var $this = this;
+		var I = this;
 		this.state = {
 			changes: null
 		};
@@ -109,9 +86,9 @@ TodoController.prototype = {
 			this.setupUI();
 			this.fetchData();
 		}
-		window.onunload = function() {
-			$this.clear();
-		};
+		$(window).unload(function() {
+			I.clear();
+		});
 	},
 	clear: function() {
 		for(var id in this.notifications.open) {
@@ -123,19 +100,19 @@ TodoController.prototype = {
 	},
 	add: function(parent, data) {
 		if (! parent.hasOwnProperty('contains') || ! types.hasOwnProperty(parent.contains)) return;
-		var $this = this;
+		var I = this;
 		var types = {
 			event: function(data) {
-				return data.extends({ name: 'Untitled', start: $this.uTime, segments: [] });
+				return Extends(data, { name: 'Untitled', start: I.uTime, segments: [] });
 			},
 			segment: function(data) {
-				return data.extends({ start: $this.uTime, end: $this.uTime, type: '' });
+				return Extends(data, { start: I.uTime, end: I.uTime, type: '' });
 			},
 			task: function(data) {
-				return data.extends({ name: 'Untitled' });
+				return Extends(data, { name: 'Untitled' });
 			},
 			project: function(data) {
-				return data.extends({ name: 'Untitled' });
+				return Extends(data, { name: 'Untitled' });
 			}
 		};
 		parent.children.push(types[parent.contains](data));
@@ -143,7 +120,7 @@ TodoController.prototype = {
 	},
 	edit: function(options) {
 		if (!options) return;
-		options.extends({
+		Extends(options, {
 			address: [0], // array of children indices, or 
 			changes: {}
 		});
@@ -156,7 +133,7 @@ TodoController.prototype = {
 			}
 		}
 		console.log(item);
-		item.extends(options.changes, true);
+		Extends(item, options.changes, true);
 		console.log(item);
 		// mark edited item for next sync
 	},
@@ -167,7 +144,7 @@ TodoController.prototype = {
 				if (options.data)
 					window.localStorage.indexedData = JSON.stringify(this.data);
 				if (options.body)
-					window.localStorage.bodyState = document.getElementsByTagName('body')[0].innerHTML;
+					window.localStorage.bodyState = $('body').html();
 			}
 		}
 	},
@@ -178,10 +155,10 @@ TodoController.prototype = {
 			if (window.localStorage.indexedData
 			&& window.localStorage.bodyState) {
 				this.data = JSON.parse(window.localStorage.indexedData);
-				document.getElementsByTagName('body')[0].innerHTML = window.localStorage.bodyState;
+				$('body').html(window.localStorage.bodyState);
 				this.setupNotifications();
 				this.setupUI();
-				this.ui.tick.element = document.getElementById('tick');
+				this.ui.tick.element = $('#tick');
 				this.connectCalendarUI();
 				this.setupTags();
 				this.setupComments();
@@ -194,85 +171,78 @@ TodoController.prototype = {
 		return false;
 	},
 	setupUI: function() {
-		var $this = this, i, j, optGroup, buttons, button;
+		var I = this, i, j, optGroup, buttons, button;
 
 		this.ui = {
-			body:{ element: document.getElementsByTagName('body')[0] },
-			punch:{ element: document.getElementById('punch') },
-			scheduleContainer:{ element: document.getElementById('schedule-container') },
+			body:{ element: $('body') },
+			punch:{ element: $('#punch') },
+			scheduleContainer:{ element: $('#schedule-container') },
 			schedule:{
-				element: document.getElementById('schedule'),
+				element: $('#schedule'),
 				dayWidth: 480
 			},
 			tick:{ element: null }, // this is generated later
-			todayTitle:{ element: document.getElementById('today-title') },
-			tasks:{ element: document.getElementById('tasks') },
-			calendar:{ element: document.getElementById('calendar') },
-			calendarWrap:{ element: document.getElementById('calendar-wrap') },
-			calendarBody:{ element: document.getElementById('calendar-body') },
-			inbox:{ element: document.getElementById('inbox') },
-			inboxButton:{ element: document.getElementById('inbox-button') },
-			optionsButton:{ element: document.getElementById('options-button') },
-			updateButton:{ element: document.getElementById('update-button') },
-			menuContainer:{ element: document.getElementById('menu-container') },
-			optionsMenu:{ element: document.getElementById('options-menu') },
-			updateMenu:{ element: document.getElementById('update-menu') }
+			todayTitle:{ element: $('#today-title') },
+			tasks:{ element: $('#tasks') },
+			calendar:{ element: $('#calendar') },
+			calendarWrap:{ element: $('#calendar-wrap') },
+			calendarBody:{ element: $('#calendar-body') },
+			inbox:{ element: $('#inbox') },
+			inboxButton:{ element: $('#inbox-button') },
+			optionsButton:{ element: $('#options-button') },
+			updateButton:{ element: $('#update-button') },
+			menuContainer:{ element: $('#menu-container') },
+			optionsMenu:{ element: $('#options-menu') },
+			updateMenu:{ element: $('#update-menu') }
 		};
-		this.ui.punch.data = this.ui.punch.element.innerHTML.replace(/<[^>]+>/g, '');
+		this.ui.punch.data = this.ui.punch.element.html().replace(/<[^>]+>/g, '');
 
 		// Update Menu
-		this.ui.updateButton.element.onclick = function() {
-			$this.toggleMenu($this.ui.updateMenu);
-		};
-		this.ui.updateMenu.buttons = this.ui.updateMenu.element.getElementsByTagName("button");
+		this.ui.updateButton.element.click(function() {
+			I.toggleMenu(I.ui.updateMenu);
+		});
+		this.ui.updateMenu.buttons = $("button", this.ui.updateMenu.element);
 		for (i = 0; i < this.ui.updateMenu.buttons.length; i++) {
 			button = this.ui.updateMenu.buttons[i];
-			button.onclick = function() {
+			button.click(function() {
 				switch (this.attributes.name.value) {
 					case 'load':
-						$this.loadUpdated();
+						I.loadUpdated();
 						break;
 					case 'save':
-						$this.flushChanges();
+						I.flushChanges();
 						break;
 				}
-				$this.toggleMenu(false);
-			};
+				I.toggleMenu(false);
+			});
 		}
 
 		// Options Menu
-		this.ui.optionsButton.element.onclick = function() {
-			$this.toggleMenu($this.ui.optionsMenu);
-		};
-		optGroups = this.ui.optionsMenu.element.getElementsByClassName("opt-group");
-		for (i = 0; i < optGroups.length; i++) {
-			buttons = optGroups[i].getElementsByTagName("button");
-			var groupName = optGroups[i].attributes.name.value;
-			switch (optGroups[i].attributes.name.value) {
+		this.ui.optionsButton.element.click(function() {
+			I.toggleMenu(I.ui.optionsMenu);
+		});
+		$optGroups = $(".opt-group", this.ui.optionsMenu.element);
+		$optGroups.each(function() {
+			buttons = $("button", $(this));
+			switch ($(this).attr("name")) {
 				case "options":
-					for (j = 0; j < buttons.length; j++) {
-						button = buttons[j];
-						if (button.attributes.name.value === "notifications") {
-							button.onclick = function() {
-								$this.toggleNotifications();
-								$this.toggleMenu($this.ui.optionsMenu, false);
-							};
-						}
-					}
+					$("button[name=notifications]", this).click(function() {
+						I.toggleNotifications();
+						I.toggleMenu(I.ui.optionsMenu, false);
+					});
 					break;
 				case "styles":
-					this.ui.optionsMenu.styles = [];
-					for (j = 0; j < buttons.length; j++) {
-						button = buttons[j];
-						this.ui.optionsMenu.styles.push(button.attributes.name.value);
-						button.onclick = function() {
-							$this.switchStyle(this.attributes.name.value);
-							$this.toggleMenu(this.ui.optionsMenu, false);
-						};
-					}
+					I.ui.optionsMenu.styles = [];
+					$("button", this).each(function() {
+						I.ui.optionsMenu.styles.push($(this).attr(name));
+						$(this).click(function() {
+							I.switchStyle($(this).val());
+							I.toggleMenu(I.ui.optionsMenu, false);
+						});
+					});
 					break;
 			}
-		}
+		});
 		if (window.localStorage && window.localStorage.style) {
 			this.switchStyle(window.localStorage.style);
 		} else {
@@ -280,13 +250,13 @@ TodoController.prototype = {
 		}
 
 		// inbox prompt
-		document.getElementById('inbox-title').onclick = function() {
-			$this.toggleInbox();
-		};
-		this.ui.inboxButton.element.onclick = function() {
+		$('#inbox-title').click(function() {
+			I.toggleInbox();
+		});
+		this.ui.inboxButton.element.click(function() {
 			if (/\bdisabled\b/.test(this.className)) return;
-			$this.addToInbox();
-		};
+			I.addToInbox();
+		});
 
 		// Schedule
 		if (this.state.scheduleScroll)
@@ -302,15 +272,15 @@ TodoController.prototype = {
 		}
 	},
 	toggleNotifications: function() {
-		var $this = this;
+		var I = this;
 		if (this.state.notifications) {
 			this.state.notifications = false;
 		} else {
 			if (window.webkitNotifications) {
 				if (window.webkitNotifications.checkPermission()) {
 					window.webkitNotifications.requestPermission(function() {
-						$this.state.notifications = true;
-						$this.remind();
+						I.state.notifications = true;
+						I.remind();
 					});
 				} else {
 					this.state.notifications = true;
@@ -319,7 +289,7 @@ TodoController.prototype = {
 		}
 	},
 	notify: function(id, message, title, force) {
-		var $this = this, openId, count = 0, first;
+		var I = this, openId, count = 0, first;
 		if (
 			!this.state.notifications
 			|| (!force
@@ -355,14 +325,14 @@ TodoController.prototype = {
 
 			this.notifications.open[id] = window.webkitNotifications.createNotification("/favicon.ico", title, message);
 			this.notifications.open[id].onclose = function() {
-				delete $this.notifications.open[id];
+				delete I.notifications.open[id];
 			};
 			this.notifications.open[id].show();
 		}
 		this.notifications.log[id] = true;
 	},
 	setupKeyboardShortcuts: function() {
-		var $this = this;
+		var I = this;
 		var responders = {
 			32:  /* SPACE */ 'addToInbox',
 			37:  /* LEFT  */ 'reverseDay',
@@ -376,22 +346,22 @@ TodoController.prototype = {
 			84:  /* t     */ 'gotoToday',
 			85:  /* u     */ 'loadUpdated'
 		};
-		document.body.onkeydown = function(event) {
+		$(document.body).keydown(function(event) {
 			console.log(event.keyCode);
 			// ignore keys with modifiers
 			if (event.metaKey || event.altKey || event.shiftKey || event.ctrlKey)
 				return true;
 			if (responders.hasOwnProperty(event.keyCode)) {
-				$this[responders[event.keyCode]]();
+				I[responders[event.keyCode]]();
 				return false;
 			}
 			return true;
-		};
+		});
 	},
 	fetchData: function(options) {
-		var $this = this;
+		var I = this;
 		if (!options) options = {};
-		options.extends({
+		Extends(options, {
 			disk: false,
 			callback: null
 		});
@@ -405,21 +375,19 @@ TodoController.prototype = {
 			for (key in fetched) {
 				if (!fetched[key]) return;
 			}
-			if (!$this.data) return;
-			$this.draw();
+			if (!I.data) return;
+			I.draw();
 			if (typeof options.callback === 'function') {
 				options.callback();
 			}
 		};
 
 		// fetch todo data
-		var parseTodo = function(json) {
-			if (!json) return;
-			if (window.localStorage) {
-				window.localStorage.todo = json;
-			}
-			var data = JSON.parse(json);
+		var parseTodo = function(data) {
 			if (!data) return;
+			if (window.localStorage) {
+				window.localStorage.todo = JSON.stringify(data);
+			}
 			var i = 0;
 			var makeIndex = function(object) {
 				object.tmpKey = i++;
@@ -430,7 +398,7 @@ TodoController.prototype = {
 				}
 				return object;
 			};
-			$this.data = makeIndex(data);
+			I.data = makeIndex(data);
 		};
 		if (JSON) {
 			if (window.localStorage && window.localStorage.todo && !options.disk) {
@@ -439,8 +407,9 @@ TodoController.prototype = {
 			} else {
 				if (this.state.changes && !confirm("changes queued, load anyway?"))
 					return false;
-				getAjax({
+				$.ajax({
 					url: 'api.php?action=json' + (options.disk ? '&f' : ''),
+					dataType: 'json',
 					success: function(data) {
 						parseTodo(data);
 					},
@@ -458,13 +427,13 @@ TodoController.prototype = {
 			if (window.localStorage) {
 				window.localStorage.punch = data;
 			}
-			$this.ui.punch.data = data;
+			I.ui.punch.data = data;
 		};
 		if (window.localStorage && window.localStorage.punch && !options.disk) {
 			parsePunch(window.localStorage.punch);
 			setFetched('punch');
 		} else {
-			getAjax({
+			$.ajax({
 				url: 'api.php?action=punch',
 				success: function(data) {
 					parsePunch(data);
@@ -480,7 +449,7 @@ TodoController.prototype = {
 	},
 	/*
 	saveData: function() {
-		var $this = this;
+		var I = this;
 		var data = JSON.parse(JSON.stringify(this.data));
 		var stripIndex = function(object) {
 			if (object.hasOwnProperty('tmpKey'))
@@ -501,11 +470,11 @@ TodoController.prototype = {
 				try {
 					data = JSON.parse(data);
 					if (data.status == 'ok') {
-						var button = filterChildren($this.ui.updateMenu.element, 'save')[0];
-						toggleClass(button, 'success', true);
+						var button = $('.save', I.ui.updateMenu.element);
+						button.addClass('success');
 						setTimeout(function() {
-							toggleClass(button, 'success', false);
-							$this.toggleMenu($this.ui.updateMenu, false);
+							button.removeClass('success');
+							I.toggleMenu(I.ui.updateMenu, false);
 						}, 1000);
 					} else {
 						alert(data);
@@ -593,7 +562,7 @@ TodoController.prototype = {
 		return hours + ':' + minutes;
 	},
 	markupCalendar: function(activeDate) {
-		var $this = this,
+		var I = this,
 			time,
 			markup = '<tr>',
 			today = new Date(),
@@ -627,9 +596,9 @@ TodoController.prototype = {
 
 				markingActiveMonthDay = (activeMonth == date.getMonth());
 				var classes = ['calendar-date'];
-				if ($this.dateString(date) == todayString)
+				if (I.dateString(date) == todayString)
 					classes.push('today');
-				if ($this.dateString(date) == activeDateString)
+				if (I.dateString(date) == activeDateString)
 					classes.push('active');
 				if (markingActiveMonthDay) {
 					classes.push('active-month');
@@ -738,11 +707,11 @@ TodoController.prototype = {
 		return markup;
 	},
 	draw: function() {
-		var $this = this, today, tomorrow, scheduleMarkup, tasksMarkup;
+		var I = this, today, tomorrow, scheduleMarkup, tasksMarkup;
 		today = this.data.children[0].children[0].children[0];
 		tomorrow = this.data.children[0].children[1].children[0];
 
-		this.ui.todayTitle.element.innerHTML = today.name;
+		this.ui.todayTitle.element.html(today.name);
 
 		// Schedule
 		this.state.scheduleScroll = this.ui.scheduleContainer.element.scrollLeft;
@@ -750,19 +719,19 @@ TodoController.prototype = {
 		scheduleMarkup += '<div id="tick"></div>';
 		scheduleMarkup += this.markupSchedule(today);
 		scheduleMarkup += this.markupSchedule(tomorrow, today.time);
-		this.ui.schedule.element.innerHTML = scheduleMarkup;
-		this.ui.tick.element = document.getElementById('tick');
+		this.ui.schedule.element.html(scheduleMarkup);
+		this.ui.tick.element = $('#tick');
 		this.ui.scheduleContainer.element.scrollLeft = this.state.scheduleScroll;
 
 		// Calendar
-		this.ui.calendarBody.element.innerHTML = this.markupCalendar(new Date(today.time * 1000));
+		this.ui.calendarBody.element.html(this.markupCalendar(new Date(today.time * 1000)));
 		this.connectCalendarUI();
 
 		// Tasks
-		this.ui.tasks.element.innerHTML = this.markupProjects(today);
+		this.ui.tasks.element.html(this.markupProjects(today));
 
 		// Inbox
-		this.ui.inbox.element.innerHTML = this.markupInbox();
+		this.ui.inbox.element.html(this.markupInbox());
 		
 		this.setupTags();
 		this.setupComments();
@@ -813,54 +782,35 @@ TodoController.prototype = {
 		}
 	},
 	connectCalendarUI: function() {
-		var $this = this;
-		var dates = document.getElementsByClassName('calendar-date');
-		for (var i = 0; i < dates.length; i++) {
-			dates[i].onclick = function() {
-				if (! this.attributes.key) return true;
-				var key = this.attributes.key.value;
-				$this.gotoDay($this.lookupObject(key));
-			};
-		}
-		this.ui.todayTitle.element.onclick = function() {
-			$this.toggleCalendar();
-		};
+		var I = this;
+		$('.calendar-date').click(function() {
+			var key = $(this).attr("key");
+			if (!key) return true;
+			I.gotoDay(I.lookupObject(key));
+		});
+		this.ui.todayTitle.element.click(function() {
+			I.toggleCalendar();
+		});
+	},
+	highlightTags: function(tagName) {
+		$('.tag').each(function() {
+			$(this).toggleClass('highlight', $(this).hasClass("tag-" + tagName));
+		});
 	},
 	setupTags: function() {
+		var I;
+		I = this;
 		// interactive tags
-		var $tags = document.getElementsByClassName('tag');
-		window.highlightTags = function(tagName) {
-			var tagPattern = tagName ? new RegExp(' *' + tagName + ' *') : false;
-			for (var i = 0; i < $tags.length; i++) {
-				toggleClass($tags[i], 'highlight', !!tagName && tagPattern.test($tags[i].className));
-			}
-		};
-		for (var i = 0; i < $tags.length; i++) {
-			$tags[i].onclick = function() {
-				highlightTags(toggleClass(this, 'highlight') ? this.className.replace(/\b(tag|highlight| +)\b/g, '') : false);
-			};
-		}
+		$('.tag').click(function() {
+			var highlighted, tagName;
+			highlighted = $(this).toggleClass('highlight').hasClass("highlight");
+			I.highlightTags(highlighted ? $(this)[0].className.replace(/.*tag-([^ ]+).*$/, '$1') : false);
+		});
 	},
 	setupComments: function() { // would be private
-		// toggle comments
-		var $this = this,
-			$projects = document.getElementsByClassName('project'),
-			$tasks = document.getElementsByClassName('task');
-		function onCommentClick(event) {
-			if (/^[aA]$/.test(event.target.tagName) || /\b(tag|link)\b/.test(event.target.className)) {
-				return true;
-			} else {
-				toggleClass(this, 'collapsed');
-				$this.saveState({body: true});
-				event.stopImmediatePropagation();
-			}
-		}
-		for (var i = 0; i < $tasks.length; i++) {
-			$tasks[i].onclick = onCommentClick;
-		}
-		for (var i = 0; i < $projects.length; i++) {
-			$projects[i].onclick = onCommentClick;
-		}
+		$(".comment").click(function() {
+			$(this).parent().toggleClass("collapsed");
+		});
 	},
 	checkRollover: function() { // check if the schedule needs to advance to the next day, and do it
 		// stub
@@ -948,40 +898,42 @@ TodoController.prototype = {
 		}
 	},
 	updateSchedule: function() {
-		var docTimezoneOffset = -7 * 3600;
-		var today = this.data.children[0].children[0].children[0];
-		var $events = document.getElementsByClassName('event');
-		var i, j;
-		var now = Math.round(this.now.getTime() / 1000);
-		for (i = 0; i < $events.length; i++) {
-			var start = parseInt($events[i].attributes.start.value);
-			var end = parseInt($events[i].attributes.end.value);
-			toggleClass($events[i], 'now', (now >= start && now <= end));
-		}
-		var $segments = document.getElementsByClassName('segment');
-		for (i = 0; i < $segments.length; i++) {
-			var start = parseInt($segments[i].attributes.start.value);
-			var end = parseInt($segments[i].attributes.end.value);
+		var I, docTimezoneOffset, today, i, j, now, $segments, start,
+			end, $remaining, maxWidth, offset, left, hours, minutes;
+		I = this;
+		docTimezoneOffset = -7 * 3600;
+		today = this.data.children[0].children[0].children[0];
+		now = Math.round(this.now.getTime() / 1000);
+		$(".event").each(function() {
+			start = parseInt($(this).attr("start"));
+			end = parseInt($(this).attr("end"));
+			$(this).toggleClass("now", (now >= start && now <= end));
+		});
+		$segments = $('.segment');
+		$segments.each(function() {
+			start = parseInt($(this).attr("start"));
+			end = parseInt($(this).attr("end"));
 			if (now >= start && now <= end) {
-				var $remaining = filterChildren($segments[i], 'remaining')[0];
-				var maxWidth = this.secondsToPixels(end - start) - 2; // leave 2 px for left inset border
-				$remaining.style.width = Math.min(maxWidth, this.secondsToPixels(end - now) - 1) + 'px'; // leave 1px for tick border
+				$remaining = $('.remaining', this);
+				maxWidth = I.secondsToPixels(end - start) - 2; // leave 2 px for left inset border
+				$remaining.css({width: Math.min(maxWidth, I.secondsToPixels(end - now) - 1) + 'px'}); // leave 1px for tick border
 			}
-		}
+		});
 
 		if (Math.abs(this.now - (today.time + 86400) * 1000) < 86400000) { // within 24 hours of midnight
-			var offset = -docTimezoneOffset - new Date().getTimezoneOffset() * 60;
+			offset = -docTimezoneOffset - new Date().getTimezoneOffset() * 60;
 			console.log(offset / 3600);
-			var left = this.secondsToPixels(now - today.time + offset);
-			var hours = this.now.getHours().toString();
+			left = this.secondsToPixels(now - today.time + offset);
+			hours = this.now.getHours().toString();
 			if (hours.length < 2) hours = '0' + hours;
-			var minutes = this.now.getMinutes().toString();
+			minutes = this.now.getMinutes().toString();
 			if (minutes.length < 2) minutes = '0' + minutes;
-			this.ui.tick.element.innerHTML = '<span class="current-time">' + hours + ':' + minutes + '</span';
-			this.ui.tick.element.style.left = left + 'px';
-			this.ui.tick.element.style.display = 'block';
+			this.ui.tick.element.html('<span class="current-time">' + hours + ':' + minutes + '</span');
+			this.ui.tick.element.css({
+				left: left + 'px'
+			}).show();
 		} else {
-			this.ui.tick.element.style.display = 'none';
+			this.ui.tick.element.hide();
 		}
 
 		if (!this.ui.scheduleContainer.element.scrollLeft) 
@@ -995,15 +947,15 @@ TodoController.prototype = {
 		var minutesSince = Math.floor((this.now.getTime() - punchTime.getTime()) / 60000);
 		var hoursSince = Math.floor(minutesSince / 60);
 		minutesSince =  minutesSince % 60;
-		this.ui.punch.element.innerHTML = this.ui.punch.data.replace(timestampPattern, '(' + hoursSince + ':' + (minutesSince < 10 ? '0' : '') + minutesSince + ')');
+		this.ui.punch.element.html(this.ui.punch.data.replace(timestampPattern, '(' + hoursSince + ':' + (minutesSince < 10 ? '0' : '') + minutesSince + ')'));
 	},
 	tick: function(suppressRepeat) {
-		var $this = this;
+		var I = this;
 		this.now = new Date();
 		this.uTime = Math.round(this.now.getTime() / 1000);
 		if (this.interval) this.stopTick();
 		if (!suppressRepeat)
-			this.interval = setTimeout(function() { $this.tick(); }, 60010 - (this.now).getTime() % 60000);
+			this.interval = setTimeout(function() { I.tick(); }, 60010 - (this.now).getTime() % 60000);
 		this.update();
 	},
 	stopTick: function() {
@@ -1014,7 +966,7 @@ TodoController.prototype = {
 		if (string) {
 			// string = string.replace(/\b([#@]([a-zA-Z][a-zA-Z0-9_]+))/g, '<span class="tag $2">$1</span>');
 			string = string.replace(/([#@]([a-zA-Z][a-zA-Z0-9_'-]+))/g, function(matches, full, tag){
-				return '<span class="tag ' + tag.toLowerCase().replace("'", '').replace(/[_]/,'-') + '">' + full + '</span>';
+				return '<span class="tag tag-' + tag.toLowerCase().replace("'", '').replace(/[_]/,'-') + '">' + full + '</span>';
 			});
 			string = string.replace(/(https?:\/\/[^\s]*)/g, '<a href="$1" target="_blank">$1</a>');
 			string = string.replace(/((\+?1[ -])?\(?[0-9]{3}(\) |-|.)[0-9]{3}[-.][0-9]{4})/g, '<a href="tel:$1">$1</a>');
@@ -1026,8 +978,7 @@ TodoController.prototype = {
 			window.localStorage.style = style;
 		}
 		for (var i = 0; i < this.ui.optionsMenu.styles.length; i++) {
-			toggleClass(
-				this.ui.body.element,
+			this.ui.body.element.toggleClass(
 				this.ui.optionsMenu.styles[i],
 				this.ui.optionsMenu.styles[i] == style
 			);
@@ -1036,37 +987,27 @@ TodoController.prototype = {
 	toggleMenu: function(menuObject, override) {
 		var isOpen;
 		// hide the other menus
-		var otherMenus = this.ui.menuContainer.element.children;
-		for (var i = 0; i < otherMenus.length; i++) {
-			if (otherMenus[i] !== menuObject.element) {
-				toggleClass(otherMenus[i], 'open', false);
-			}
-		}
-
-		// toggle selected menu
-		if (menuObject) {
-			isOpen = toggleClass(menuObject.element, 'open', override);
-		} else {
-			isOpen = false;
-		}
+		menuObject.element
+			.toggleClass('open', override)
+			.siblings().removeClass('open');
 
 		// show menu container if selected menu is open
-		toggleClass(this.ui.menuContainer.element, 'open', isOpen);
-
-		this.ui.menuContainer.element.scrollTop = 0;
+		this.ui.menuContainer.element
+			.toggleClass('open', menuObject.element.hasClass("open"))
+			.scrollTop(0);
 	},
 	toggleCalendar: function() {
-		toggleClass(this.ui.calendarWrap.element, 'open');
+		this.ui.calendarWrap.element.toggleClass('open');
 		this.saveState({body:true});
 	},
 	toggleInbox: function() {
-		toggleClass(this.ui.inbox.element, 'open');
+		this.ui.inbox.element.toggleClass('open');
 		this.saveState({body:true});
 	},
 	addToInbox: function(task) {
 		if (this.lockChanges)
 			return;
-		var $this = this;
+		var I = this;
 
 		if (!task) {
 			task = window.prompt('task for inbox');
@@ -1074,11 +1015,11 @@ TodoController.prototype = {
 		if (!task)
 			return;
 
-		toggleClass(this.ui.updateButton.element, 'changed', true);
-		$this.queueChange('inbox', task);
-		$this.data.children[2].children[3].children.push({name: task});
-		$this.draw();
-		$this.flushChanges();
+		this.ui.updateButton.element.addClass('changed');
+		I.queueChange('inbox', task);
+		I.data.children[2].children[3].children.push({name: task});
+		I.draw();
+		I.flushChanges();
 	},
 	queueChange: function(address, data) {
 		// so far only works for inbox
@@ -1087,33 +1028,32 @@ TodoController.prototype = {
 		if (!this.state.changes[address])
 			this.state.changes[address] = [];
 		this.state.changes[address].push(data);
-		toggleClass(this.ui.updateButton.element, "changed", true);
+		this.ui.updateButton.element.addClass("changed");
 		this.saveState();
 	},
 	flushChanges: function() {
 		// only inbox so far
-		var $this = this,
+		var I = this,
 			button = this.ui.updateButton.element;
 		this.lockChanges = true;
-		getAjax({
+		$.ajax({
 			method: 'POST',
 			url: 'api.php?action=inbox&changes=' + encodeURIComponent(JSON.stringify(this.state.changes)),
 			complete: function() {
-				$this.lockChanges = false;
+				I.lockChanges = false;
 			},
+			dataType: 'json',
 			success: function(data) {
-				try {
-					data = JSON.parse(data);
-					if (data.status == 'ok') {
-						$this.state.changes = null;
-						$this.saveState();
-						toggleClass(button, 'success', true);
-						toggleClass(button, "changed", false);
-						setTimeout(function() {
-							toggleClass(button, 'success', false);
-						}, 1000);
-					}
-				} catch(e) {}
+				if (data.status == 'ok') {
+					I.state.changes = null;
+					I.saveState();
+					button
+						.addClass("success")
+						.removeClass("changed")
+						.delay(1000, function() {
+							button.removeClass("success");
+						});
+				}
 			}
 		});
 	},
@@ -1132,7 +1072,7 @@ TodoController.prototype = {
 	}
 };
 
-window.onload = function(){
+$(function(){
 	window.controller = new TodoController()
 	window.controller.init();
-}
+})
