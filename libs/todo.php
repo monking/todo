@@ -261,7 +261,7 @@ class Todo {
 	 * load and parse Vim Outliner formatted data
 	 */
 	public function loadOTL() {
-		$file_path = $this->user->dir . '/todo.otl';
+		$file_path = $this->user->dir . DS . 'todo.otl';
 		if (!file_exists($file_path))
 			return false;
 		$otl = file_get_contents($file_path);
@@ -395,7 +395,6 @@ class Todo {
 	public function saveJSON() {
 		$file_path = $this->user->dir . '/todo.json';
 		file_put_contents($file_path, json_encode($this->data));
-		readfile($file_path);
 	}
 
 	/**
