@@ -1,6 +1,7 @@
 <?php
 // copy to config.php
 
+define('DS', DIRECTORY_SEPARATOR);
 define('APPROOT', __DIR__);
 
 date_default_timezone_set('America/Los_Angeles');
@@ -14,8 +15,8 @@ date_default_timezone_set('America/Los_Angeles');
 // Authentication
 require_once('libs/basic_user.php');
 $user = new BasicUser(array(
-	'credentials_path' => constant('APPROOT') . '/credentials.json',
-	'user_dir' => constant('APPROOT') . '/users',
+	'credentials_path' => constant('APPROOT') . DS . 'credentials.json',
+	'user_dir' => constant('APPROOT') . DS . 'users',
 	'user_default_settings' => array(
 		'use_otl' => false
 	),
