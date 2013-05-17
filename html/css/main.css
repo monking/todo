@@ -93,6 +93,7 @@ button{text-decoration:none;border:0px;padding:1em 0.3em;margin:0 0.2em;border-r
 	padding: 1em;
 	background-color: rgba(0,0,0,0.5);
 	z-index: 3;
+	display: none;
 }
 #context-menu label {
 	display: block;
