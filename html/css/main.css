@@ -87,6 +87,19 @@ button{text-decoration:none;border:0px;padding:1em 0.3em;margin:0 0.2em;border-r
 .sample-black{color:#F00}
 .sample-night{color:#F00}
 
+#context-menu
+{
+	position: absolute;
+	padding: 1em;
+	background-color: rgba(0,0,0,0.5);
+	z-index: 3;
+}
+#context-menu label {
+	display: block;
+	line-height: 1.5;
+	cursor: pointer;
+}
+
 /* --- dark color scheme { --- */
 body.dark{background-color:#222;color:#FFF}
 .dark a{color:#F9F}

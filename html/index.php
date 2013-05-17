@@ -73,5 +73,17 @@ require_once('../config.php');
 			<button id="options-button">OPTIONS</button>
 			<button id="update-button">UPDATE</button>
 		</div>
+		<div id="context-menu">
+			<label class="done"><input type="radio" name="status" value="done" /> // done</label>
+			<label class="normal"><input type="radio" name="status" value="normal" /> __ normal</label>
+			<label class="next"><input type="radio" name="status" value="next" /> == next</label>
+			<label class="now"><input type="radio" name="status" value="now" /> >> now</label>
+			<label class="paused"><input type="radio" name="status" value="paused" /> :: paused</label>
+			<label class="hold"><input type="radio" name="status" value="hold" /> .. hold</label>
+			<label class="canceled"><input type="radio" name="status" value="canceled" /> xx canceled</label>
+			<label class="question"><input type="radio" name="status" value="question" /> ?? question</label>
+			<label class="urgent"><input type="radio" name="status" value="urgent" /> !! urgent</label>
+			<label class="note"><input type="radio" name="status" value="note" /> ## note</label>
+		</div>
 	</body>
 </html>

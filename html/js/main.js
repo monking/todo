@@ -161,7 +161,7 @@ TodoController.prototype = {
 				this.ui.tick.element = $('#tick');
 				this.connectCalendarUI();
 				this.setupTags();
-				this.setupComments();
+				this.setupTasks();
 				this.tick();
 			} else {
 				this.fetchData();
@@ -181,19 +181,20 @@ TodoController.prototype = {
 				element: $('#schedule'),
 				dayWidth: 480
 			},
-			tick:{ element: null }, // this is generated later
-			todayTitle:{ element: $('#today-title') },
-			tasks:{ element: $('#tasks') },
-			calendar:{ element: $('#calendar') },
-			calendarWrap:{ element: $('#calendar-wrap') },
-			calendarBody:{ element: $('#calendar-body') },
-			inbox:{ element: $('#inbox') },
-			inboxButton:{ element: $('#inbox-button') },
+			tick:         { element: null }, // this is generated later
+			todayTitle:   { element: $('#today-title') },
+			tasks:        { element: $('#tasks') },
+			calendar:     { element: $('#calendar') },
+			calendarWrap: { element: $('#calendar-wrap') },
+			calendarBody: { element: $('#calendar-body') },
+			inbox:        { element: $('#inbox') },
+			inboxButton:  { element: $('#inbox-button') },
 			optionsButton:{ element: $('#options-button') },
-			updateButton:{ element: $('#update-button') },
+			updateButton: { element: $('#update-button') },
 			menuContainer:{ element: $('#menu-container') },
-			optionsMenu:{ element: $('#options-menu') },
-			updateMenu:{ element: $('#update-menu') }
+			optionsMenu:  { element: $('#options-menu') },
+			updateMenu:   { element: $('#update-menu') },
+			contextMenu:  { element: $('#context-menu') }
 		};
 		this.ui.punch.data = this.ui.punch.element.html().replace(/<[^>]+>/g, '');
 
@@ -684,7 +685,7 @@ TodoController.prototype = {
 	markupTask: function(task) {
 		var markup = '';
 		var tagged = this.markupTags(task.name);
-		markup += '<div class="task collapsed ' + task.status + '">'
+		markup += '<div class="task collapsed ' + task.status + '" data-key="' + task.tmpKey + '">'
 			+ tagged;
 		if (task.hasOwnProperty('comment')) {
 			markup += '<pre class="comment">'
@@ -734,7 +735,7 @@ TodoController.prototype = {
 		this.ui.inbox.element.html(this.markupInbox());
 		
 		this.setupTags();
-		this.setupComments();
+		this.setupTasks();
 		this.tick();
 		this.saveState({body:true,data:true});
 	},
@@ -807,7 +808,22 @@ TodoController.prototype = {
 			I.highlightTags(highlighted ? $(this)[0].className.replace(/.*tag-([^ ]+).*$/, '$1') : false);
 		});
 	},
-	setupComments: function() { // would be private
+	setupTasks: function() { // would be private
+		var I = this;
+		$(".task").click(function(event) {
+			var labels, task;
+			task = I.lookupObject($(this).attr("data-key"));
+			I.ui.contextMenu.element.css({
+				left: event.clientX + "px",
+				top: event.clientY + "px"
+			}).fadeIn("fast");
+			options = $("input", I.ui.contextMenu.element);
+			options.unbind("click").click(function(event) {
+				task.status = $(this).val();
+				I.draw();
+				I.ui.contextMenu.element.hide();
+			});
+		});
 		$(".comment").click(function() {
 			$(this).parent().toggleClass("collapsed");
 		});
