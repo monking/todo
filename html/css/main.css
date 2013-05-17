@@ -49,8 +49,8 @@ body{margin:0;padding:20px 10px 120px 10px;background-color;#000}
 button{text-decoration:none;border:0px;padding:1em 0.3em;margin:0 0.2em;border-radius:0.5em;font-size:140%;cursor:pointer;border:3px solid;text-align:center}
 .disabled{opacity:0.3}
 
-.footer{width:100%;text-align:center;position:fixed;left:0;bottom:0;width:100%;height:70px;line-height:70px}
-.footer button{display:inline-block;vertical-align:middle}
+nav{width:100%;text-align:center;position:fixed;left:0;bottom:0;width:100%;height:70px;line-height:70px}
+nav button{display:inline-block;vertical-align:middle}
 
 .current-time{background-color:inherit;font-size:250%;padding:0 0.3em;display:block;line-height:45px}
 
@@ -135,7 +135,7 @@ body.dark{background-color:#222;color:#FFF}
 .dark .current-time{background-color:#000}
 .dark .changed{background-color:#C62 !important;color:#FFF !important}
 .dark .success{background-color:#2C6 !important;color:#FFF !important}
-.dark .footer{background-color:rgba(20,20,20,0.5)}
+.dark nav{background-color:rgba(20,20,20,0.5)}
 
 .dark button{color:#999;background-color:#111;border-color:#000}
 
@@ -187,7 +187,7 @@ body.light{background-color:#EEE;color:#222}
 .light .current-time{background-color:#FFF}
 .light .changed{background-color:#C62 !important;color:#000 !important}
 .light .success{background-color:#2C6 !important;color:#000 !important}
-.light .footer{background-color:rgba(255,255,255,0.5)}
+.light nav{background-color:rgba(255,255,255,0.5)}
 
 .light button{color:#000;background-color:#CCC;border-color:#FFF}
 
@@ -234,7 +234,7 @@ body.black{background-color:#000;color:#FFF}
 .black #tick{color:#0CF;border-color:#0CF}
 .black .current-time{background-color:#000}
 .black .success{background-color:#2C6 !important;color:#FFF !important}
-.black .footer{background-color:rgba(0,0,0,0.6)}
+.black nav{background-color:rgba(0,0,0,0.6)}
 
 .black button{color:#999;background-color:#000;border-color:#111}
 
@@ -281,7 +281,7 @@ body.night{background-color:#200;color:#C00}
 .night #tick{color:#F00;border-color:#F00}
 .night .current-time{background-color:#000}
 .night .success{background-color:#F00 !important;color:#000 !important}
-.night .footer{background-color:rgba(0,0,0,0.6)}
+.night nav{background-color:rgba(0,0,0,0.6)}
 
 .night button{color:#C00;background-color:#000;border-color:#200}
 

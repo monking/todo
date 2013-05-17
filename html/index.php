@@ -49,41 +49,36 @@ require_once('../config.php');
 		<h2 id="inbox-title">Inbox</h2>
 		<div id="inbox"></div>
 		<div id="menu-container">
-			<div id="update-menu" class="menu">
-				<button class="save" name="save">SAVE</button>
-				<button class="load" name="load">LOAD</button>
-				<button class="load" name="load">EDIT</button>
-			</div>
-			<div id="options-menu" class="menu">
+		</div>
+		<nav>
+			<button rel="inbox">INBOX</button>
+			<button rel="menu" data-menu="options">OPTIONS</button>
+			<button rel="update">UPDATE</button>
+			<div class="menu options">
 				<div class="opt-group cf" name="options">
 					<label>Options</label>
-					<button name="notifications">Enable Notifications</button>
+					<button rel="toggle-notifications">Enable Notifications</button>
 				</div>
 				<div class="opt-group cf" name="styles">
 					<label>Styles</label>
-					<button class="sample-dark" name="dark">DARK</button>
-					<button class="sample-light" name="light">LIGHT</button>
-					<button class="sample-black" name="black">BLACK</button>
-					<button class="sample-night" name="night">NIGHT</button>
+					<button class="sample-dark" rel="colorscheme" name="dark">DARK</button>
+					<button class="sample-light" rel="colorscheme" name="light">LIGHT</button>
+					<button class="sample-black" rel="colorscheme" name="black">BLACK</button>
+					<button class="sample-night" rel="colorscheme" name="night">NIGHT</button>
 				</div>
 			</div>
-		</div>
-		<div class="footer">
-			<button id="inbox-button">INBOX</button>
-			<button id="options-button">OPTIONS</button>
-			<button id="update-button">UPDATE</button>
-		</div>
+		</nav>
 		<div id="context-menu">
-			<label class="done"><input type="radio" name="status" value="done" /> // done</label>
-			<label class="normal"><input type="radio" name="status" value="normal" /> __ normal</label>
-			<label class="next"><input type="radio" name="status" value="next" /> == next</label>
-			<label class="now"><input type="radio" name="status" value="now" /> >> now</label>
-			<label class="paused"><input type="radio" name="status" value="paused" /> :: paused</label>
-			<label class="hold"><input type="radio" name="status" value="hold" /> .. hold</label>
-			<label class="canceled"><input type="radio" name="status" value="canceled" /> xx canceled</label>
-			<label class="question"><input type="radio" name="status" value="question" /> ?? question</label>
-			<label class="urgent"><input type="radio" name="status" value="urgent" /> !! urgent</label>
-			<label class="note"><input type="radio" name="status" value="note" /> ## note</label>
+			<label class="done"><input type="radio" rel="status" name="status" value="done" /> // done</label>
+			<label class="normal"><input type="radio" rel="status" name="status" value="normal" /> __ normal</label>
+			<label class="next"><input type="radio" rel="status" name="status" value="next" /> == next</label>
+			<label class="now"><input type="radio" rel="status" name="status" value="now" /> &gt;&gt; now</label>
+			<label class="paused"><input type="radio" rel="status" name="status" value="paused" /> :: paused</label>
+			<label class="hold"><input type="radio" rel="status" name="status" value="hold" /> .. hold</label>
+			<label class="canceled"><input type="radio" rel="status" name="status" value="canceled" /> xx canceled</label>
+			<label class="question"><input type="radio" rel="status" name="status" value="question" /> ?? question</label>
+			<label class="urgent"><input type="radio" rel="status" name="status" value="urgent" /> !! urgent</label>
+			<label class="note"><input type="radio" rel="status" name="status" value="note" /> ## note</label>
 		</div>
 	</body>
 </html>

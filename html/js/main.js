@@ -183,67 +183,56 @@ TodoController.prototype = {
 			},
 			tick:         { element: null }, // this is generated later
 			todayTitle:   { element: $('#today-title') },
-			tasks:        { element: $('#tasks') },
 			calendar:     { element: $('#calendar') },
 			calendarWrap: { element: $('#calendar-wrap') },
 			calendarBody: { element: $('#calendar-body') },
+			tasks:        { element: $('#tasks') },
 			inbox:        { element: $('#inbox') },
-			inboxButton:  { element: $('#inbox-button') },
-			optionsButton:{ element: $('#options-button') },
-			updateButton: { element: $('#update-button') },
-			menuContainer:{ element: $('#menu-container') },
-			optionsMenu:  { element: $('#options-menu') },
-			updateMenu:   { element: $('#update-menu') },
+			updateButton: { element: $('nav button[rel=update]') },
 			contextMenu:  { element: $('#context-menu') }
 		};
+		this.styles = ["dark", "black", "night", "light"];
 		this.ui.punch.data = this.ui.punch.element.html().replace(/<[^>]+>/g, '');
 
-		// Update Menu
-		this.ui.updateButton.element.click(function() {
-			I.toggleMenu(I.ui.updateMenu);
-		});
-		this.ui.updateMenu.buttons = $("button", this.ui.updateMenu.element);
-		for (i = 0; i < this.ui.updateMenu.buttons.length; i++) {
-			button = this.ui.updateMenu.buttons[i];
-			button.click(function() {
-				switch (this.attributes.name.value) {
-					case 'load':
-						I.loadUpdated();
-						break;
-					case 'save':
-						I.flushChanges();
-						break;
-				}
-				I.toggleMenu(false);
-			});
-		}
-
-		// Options Menu
-		this.ui.optionsButton.element.click(function() {
-			I.toggleMenu(I.ui.optionsMenu);
-		});
-		$optGroups = $(".opt-group", this.ui.optionsMenu.element);
-		$optGroups.each(function() {
-			buttons = $("button", $(this));
-			switch ($(this).attr("name")) {
-				case "options":
-					$("button[name=notifications]", this).click(function() {
-						I.toggleNotifications();
-						I.toggleMenu(I.ui.optionsMenu, false);
-					});
-					break;
-				case "styles":
-					I.ui.optionsMenu.styles = [];
-					$("button", this).each(function() {
-						I.ui.optionsMenu.styles.push($(this).attr(name));
-						$(this).click(function() {
-							I.switchStyle($(this).val());
-							I.toggleMenu(I.ui.optionsMenu, false);
-						});
-					});
-					break;
+		// prepare nav
+		this.buttonActions = {
+			"inbox":function() {
+				I.addToInbox();
+			},
+			"load":function() {
+				I.loadUpdated();
+			},
+			"save":function() {
+				I.flushChanges();
+			},
+			"save":function() {
+				I.flushChanges();
+			},
+			"colorscheme":function(value) {
+				I.switchStyle(value);
+			},
+			"menu":function(value) {
+				var menu = $("#" + value);
+				menu.data("mousedown", true);
+				I.toggleMenu(menu);
+			},
+			"notifications":function() {
+				I.toggleNotifications();
 			}
+		};
+		$("nav button").click(function(event) {
+			var button, action, menu;
+			button = $(this);
+			action = button.attr("rel");
+			if (typeof I.buttonActions[action] === "function") {
+				I.buttonActions[action](button.val(), event);
+			}
+			menu = button.closest(".menu");
+			if (menu.length)
+				I.toggleMenu(menu, false);
 		});
+
+		// set style to most recently used
 		if (window.localStorage && window.localStorage.style) {
 			this.switchStyle(window.localStorage.style);
 		} else {
@@ -253,10 +242,6 @@ TodoController.prototype = {
 		// inbox prompt
 		$('#inbox-title').click(function() {
 			I.toggleInbox();
-		});
-		this.ui.inboxButton.element.click(function() {
-			if (/\bdisabled\b/.test(this.className)) return;
-			I.addToInbox();
 		});
 
 		// Schedule
@@ -993,24 +978,17 @@ TodoController.prototype = {
 		if (window.localStorage) {
 			window.localStorage.style = style;
 		}
-		for (var i = 0; i < this.ui.optionsMenu.styles.length; i++) {
+		for (var i = 0; i < this.styles.length; i++) {
 			this.ui.body.element.toggleClass(
-				this.ui.optionsMenu.styles[i],
-				this.ui.optionsMenu.styles[i] == style
+				this.styles[i],
+				this.styles[i] == style
 			);
 		}
 	},
-	toggleMenu: function(menuObject, override) {
-		var isOpen;
-		// hide the other menus
-		menuObject.element
+	toggleMenu: function(element, override) {
+		element
 			.toggleClass('open', override)
 			.siblings().removeClass('open');
-
-		// show menu container if selected menu is open
-		this.ui.menuContainer.element
-			.toggleClass('open', menuObject.element.hasClass("open"))
-			.scrollTop(0);
 	},
 	toggleCalendar: function() {
 		this.ui.calendarWrap.element.toggleClass('open');
