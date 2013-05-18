@@ -796,7 +796,6 @@ TodoController.prototype = {
 		var I = this;
 		// FIXME: use hybrid mousedown/touch-down event
 		$(".task .title").mousedown(function(event) {
-			// FIXME: disable selection from this point until mouseup (css?)
 			var labels, task;
 			task = I.lookupObject($(this).closest(".task").attr("data-key"));
 			I.showContextMenu({
@@ -817,6 +816,7 @@ TodoController.prototype = {
 			x: 0,
 			y: 0
 		});
+		this.ui.body.element.addClass("no-select");
 		this.ui.contextMenu.element.css({
 			display: "block",
 			visibility: "hidden"
@@ -864,10 +864,15 @@ TodoController.prototype = {
 			options.object.status = $(this).attr("data-value");
 			I.draw();
 			I.hideContextMenu();
+		}).unbind("mouseover").mouseover(function() {
+			$(this).addClass("drag-over");
+		}).unbind("mouseout").mouseout(function() {
+			$(this).removeClass("drag-over");
 		});
 	},
 	hideContextMenu: function() {
-		$(".option", this.ui.contextMenu.element).unbind("mouseup");
+		this.ui.body.element.removeClass("no-select");
+		$(".option", this.ui.contextMenu.element).unbind("mouseup mouseover mouseout").removeClass("drag-over");
 		this.ui.contextMenu.element.fadeOut("fast");
 	},
 	checkRollover: function() { // check if the schedule needs to advance to the next day, and do it

@@ -69,16 +69,16 @@ require_once('../config.php');
 			</div>
 		</nav>
 		<div id="context-menu">
-			<div class="option done" rel="status" data-value="done" />// done</div>
-			<div class="option normal" rel="status" data-value="normal" />__ normal</div>
-			<div class="option next" rel="status" data-value="next" />== next</div>
-			<div class="option now" rel="status" data-value="now" />&gt;&gt; now</div>
-			<div class="option paused" rel="status" data-value="paused" />:: paused</div>
-			<div class="option hold" rel="status" data-value="hold" />.. hold</div>
-			<div class="option canceled" rel="status" data-value="canceled" />xx canceled</div>
-			<div class="option question" rel="status" data-value="question" />?? question</div>
-			<div class="option urgent" rel="status" data-value="urgent" />!! urgent</div>
 			<div class="option note" rel="status" data-value="note" />## note</div>
+			<div class="option canceled" rel="status" data-value="canceled" />xx canceled</div>
+			<div class="option hold" rel="status" data-value="hold" />.. hold</div>
+			<div class="option paused" rel="status" data-value="paused" />:: paused</div>
+			<div class="option done" rel="status" data-value="done" />// done</div>
+			<div class="option now" rel="status" data-value="now" />&gt;&gt; now</div>
+			<div class="option next" rel="status" data-value="next" />== next</div>
+			<div class="option normal" rel="status" data-value="normal" />__ normal</div>
+			<div class="option urgent" rel="status" data-value="urgent" />!! urgent</div>
+			<div class="option question" rel="status" data-value="question" />?? question</div>
 		</div>
 	</body>
 </html>

@@ -6,6 +6,7 @@
 	src: local('Monaco'), local('Deja Vu Sans Mono'), local('Lucida Console'), local('Droid Sans Mono'), local('DroidSansMono'), url(http://themes.googleusercontent.com/static/fonts/droidsansmono/v4/ns-m2xQYezAtqh7ai59hJaH0X__W3S3MJL29bc5CWfs.woff) format('woff');
 }
 body{margin:0;padding:20px 10px 120px 10px;background-color;#000}
+.no-select { -webkit-user-select: none; user-select: none; }
 *{font-family:"Monaco","Deja Vu Sans Mono","Lucida Console","Droid Sans Mono",monospace;font-size:12px;line-height:1.5}
 .cf:before,
 .cf:after {
@@ -19,7 +20,12 @@ body{margin:0;padding:20px 10px 120px 10px;background-color;#000}
 .opt-group label { display: block; }
 /* *{;-webkit-text-size-adjust:none} /* TODO: fix text scaling on iPhone more specifically */
 .collapsed{position:relative}
-.collapsed > .comment{position:absolute;top:0.2em;left:-1em;overflow:hidden;width:0.5em;height:1em;text-indent:-9999em;cursor:pointer;margin:0;padding:0}
+.collapsed > .comment{position:absolute;top:0.2em;left:-2em;overflow:hidden;width:1.5em;height:1.5em;cursor:pointer;margin:0;padding:0}
+.collapsed > .comment:before {
+	display: block;
+	height: 100%;
+	content: " ";
+}
 .tag{cursor:pointer}
 
 .icon{background-size:8px;display:inline-block}
@@ -38,6 +44,7 @@ body{margin:0;padding:20px 10px 120px 10px;background-color;#000}
 .event .name .remind{margin-right:0.5em}
 
 .task{margin-left:2em;padding-left:2em;text-indent:-2em;cursor:default}
+.task .title {line-height: 2em;}
 .urgent{font-weight:bold;font-style:italic;-webkit-animation: pulsate 1s ease-out;-webkit-animation-iteration-count: infinite;opacity: 0.8}
 @-webkit-keyframes pulsate {
     0% {opacity: 0.8}
@@ -74,13 +81,13 @@ nav button{display:inline-block;vertical-align:middle}
 #calendar tbody td:first-child{border-left-width:0}
 #calendar .date{float:right;font-size:150%;padding:0.1em}
 
-::-webkit-scrollbar			  {display:none}
-::-webkit-scrollbar-button	   {display:none}
-::-webkit-scrollbar-track		{display:none}
-::-webkit-scrollbar-track-piece  {display:none}
-::-webkit-scrollbar-thumb		{display:none}
-::-webkit-scrollbar-corner	   {display:none}
-::-webkit-resizer				{display:none}
+::-webkit-scrollbar             {display:none}
+::-webkit-scrollbar-button      {display:none}
+::-webkit-scrollbar-track       {display:none}
+::-webkit-scrollbar-track-piece {display:none}
+::-webkit-scrollbar-thumb       {display:none}
+::-webkit-scrollbar-corner      {display:none}
+::-webkit-resizer               {display:none}
 
 .sample-dark{color:#F00}
 .sample-light{color:#F00}
@@ -98,10 +105,11 @@ nav button{display:inline-block;vertical-align:middle}
 }
 #context-menu .option {
 	display: block;
-	line-height: 1.5;
+	line-height: 2em;
 	cursor: pointer;
 }
 /* FIXME: what's the pseudo-element for drag-over? */
+#context-menu .option.drag-over,
 #context-menu .option:hover {
 	outline: 2px solid #FFF;
 }
