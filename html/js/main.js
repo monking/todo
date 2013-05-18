@@ -649,7 +649,7 @@ TodoController.prototype = {
 			for (i = 0; i < day.children.length; i++) {
 				var project = day.children[i];
 				markup += '<div class="project collapsed">'
-					+ this.markupTags(project.name);
+					+ '<div class="title">' + this.markupTags(project.name) + '</div>';
 				if (project.hasOwnProperty('comment')) {
 					markup += '<pre class="comment">'
 						+ this.markupTags(project.comment)
@@ -669,9 +669,8 @@ TodoController.prototype = {
 	},
 	markupTask: function(task) {
 		var markup = '';
-		var tagged = this.markupTags(task.name);
 		markup += '<div class="task collapsed ' + task.status + '" data-key="' + task.tmpKey + '">'
-			+ tagged;
+			+ '<div class="title">' + this.markupTags(task.name) + '</div>';
 		if (task.hasOwnProperty('comment')) {
 			markup += '<pre class="comment">'
 				+ this.markupTags(task.comment)
@@ -795,23 +794,81 @@ TodoController.prototype = {
 	},
 	setupTasks: function() { // would be private
 		var I = this;
-		$(".task").click(function(event) {
+		// FIXME: use hybrid mousedown/touch-down event
+		$(".task .title").mousedown(function(event) {
+			// FIXME: disable selection from this point until mouseup (css?)
 			var labels, task;
-			task = I.lookupObject($(this).attr("data-key"));
-			I.ui.contextMenu.element.css({
-				left: event.clientX + "px",
-				top: event.clientY + "px"
-			}).fadeIn("fast");
-			options = $("input", I.ui.contextMenu.element);
-			options.unbind("click").click(function(event) {
-				task.status = $(this).val();
-				I.draw();
-				I.ui.contextMenu.element.hide();
+			task = I.lookupObject($(this).closest(".task").attr("data-key"));
+			I.showContextMenu({
+				object: task,
+				x: event.pageX,
+				y: event.pageY
 			});
 		});
 		$(".comment").click(function() {
 			$(this).parent().toggleClass("collapsed");
 		});
+	},
+	showContextMenu: function(options) {
+		var I, bounds, $window, position;
+		I = this;
+		Extends(options, {
+			object: null,
+			x: 0,
+			y: 0
+		});
+		this.ui.contextMenu.element.css({
+			display: "block",
+			visibility: "hidden"
+		});
+		this.ui.contextMenu.dims = {
+			width: this.ui.contextMenu.element.outerWidth(),
+			height: this.ui.contextMenu.element.outerHeight()
+		};
+		$window = $(window);
+		bounds = {
+			top: $window.scrollTop(),
+			left: $window.scrollLeft()
+		};
+		bounds.right = bounds.left + $window.innerWidth();
+		bounds.bottom = bounds.top + $window.innerHeight();
+		position = {
+			x: Math.round(
+				Math.min(
+					bounds.right - this.ui.contextMenu.dims.width,
+					Math.max(
+						bounds.left,
+						options.x - this.ui.contextMenu.dims.width / 2
+					)
+				)
+			),
+			y: Math.round(
+				Math.min(
+					bounds.bottom - this.ui.contextMenu.dims.height,
+					Math.max(
+						bounds.top,
+						options.y - this.ui.contextMenu.dims.height / 2
+					)
+				)
+			)
+		};
+		this.ui.contextMenu.element.css({
+			visibility: "visible",
+			left: position.x + "px",
+			top: position.y + "px"
+		}).show();
+		menuOptions = $(".option", this.ui.contextMenu.element);
+		// FIXME: use hybrid mouseup/touch-release event
+		menuOptions.unbind("mouseup").mouseup(function(event) {
+			// FIXME: this is specific to tasks
+			options.object.status = $(this).attr("data-value");
+			I.draw();
+			I.hideContextMenu();
+		});
+	},
+	hideContextMenu: function() {
+		$(".option", this.ui.contextMenu.element).unbind("mouseup");
+		this.ui.contextMenu.element.fadeOut("fast");
 	},
 	checkRollover: function() { // check if the schedule needs to advance to the next day, and do it
 		// stub

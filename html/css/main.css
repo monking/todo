@@ -37,7 +37,7 @@ body{margin:0;padding:20px 10px 120px 10px;background-color;#000}
 .event .name{padding-left:0.5em}
 .event .name .remind{margin-right:0.5em}
 
-.task{margin-left:2em;padding-left:2em;text-indent:-2em}
+.task{margin-left:2em;padding-left:2em;text-indent:-2em;cursor:default}
 .urgent{font-weight:bold;font-style:italic;-webkit-animation: pulsate 1s ease-out;-webkit-animation-iteration-count: infinite;opacity: 0.8}
 @-webkit-keyframes pulsate {
     0% {opacity: 0.8}
@@ -87,6 +87,7 @@ nav button{display:inline-block;vertical-align:middle}
 .sample-black{color:#F00}
 .sample-night{color:#F00}
 
+/* FIXME: save color styles for colorschemes */
 #context-menu
 {
 	position: absolute;
@@ -95,10 +96,14 @@ nav button{display:inline-block;vertical-align:middle}
 	z-index: 3;
 	display: none;
 }
-#context-menu label {
+#context-menu .option {
 	display: block;
 	line-height: 1.5;
 	cursor: pointer;
+}
+/* FIXME: what's the pseudo-element for drag-over? */
+#context-menu .option:hover {
+	outline: 2px solid #FFF;
 }
 
 /* --- dark color scheme { --- */

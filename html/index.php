@@ -69,16 +69,16 @@ require_once('../config.php');
 			</div>
 		</nav>
 		<div id="context-menu">
-			<label class="done"><input type="radio" rel="status" name="status" value="done" /> // done</label>
-			<label class="normal"><input type="radio" rel="status" name="status" value="normal" /> __ normal</label>
-			<label class="next"><input type="radio" rel="status" name="status" value="next" /> == next</label>
-			<label class="now"><input type="radio" rel="status" name="status" value="now" /> &gt;&gt; now</label>
-			<label class="paused"><input type="radio" rel="status" name="status" value="paused" /> :: paused</label>
-			<label class="hold"><input type="radio" rel="status" name="status" value="hold" /> .. hold</label>
-			<label class="canceled"><input type="radio" rel="status" name="status" value="canceled" /> xx canceled</label>
-			<label class="question"><input type="radio" rel="status" name="status" value="question" /> ?? question</label>
-			<label class="urgent"><input type="radio" rel="status" name="status" value="urgent" /> !! urgent</label>
-			<label class="note"><input type="radio" rel="status" name="status" value="note" /> ## note</label>
+			<div class="option done" rel="status" data-value="done" />// done</div>
+			<div class="option normal" rel="status" data-value="normal" />__ normal</div>
+			<div class="option next" rel="status" data-value="next" />== next</div>
+			<div class="option now" rel="status" data-value="now" />&gt;&gt; now</div>
+			<div class="option paused" rel="status" data-value="paused" />:: paused</div>
+			<div class="option hold" rel="status" data-value="hold" />.. hold</div>
+			<div class="option canceled" rel="status" data-value="canceled" />xx canceled</div>
+			<div class="option question" rel="status" data-value="question" />?? question</div>
+			<div class="option urgent" rel="status" data-value="urgent" />!! urgent</div>
+			<div class="option note" rel="status" data-value="note" />## note</div>
 		</div>
 	</body>
 </html>
