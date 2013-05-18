@@ -6,7 +6,14 @@
 	src: local('Monaco'), local('Deja Vu Sans Mono'), local('Lucida Console'), local('Droid Sans Mono'), local('DroidSansMono'), url(http://themes.googleusercontent.com/static/fonts/droidsansmono/v4/ns-m2xQYezAtqh7ai59hJaH0X__W3S3MJL29bc5CWfs.woff) format('woff');
 }
 body{margin:0;padding:20px 10px 120px 10px;background-color;#000}
-.no-select { -webkit-user-select: none; user-select: none; }
+/* FIXME: not sure about setting this on body, okay for now */
+body,
+.no-select,
+.tast .title
+{
+	-webkit-user-select: none;
+	user-select: none;
+}
 *{font-family:"Monaco","Deja Vu Sans Mono","Lucida Console","Droid Sans Mono",monospace;font-size:12px;line-height:1.5}
 .cf:before,
 .cf:after {
