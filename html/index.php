@@ -49,25 +49,25 @@ require_once('../config.php');
 		<div id="tasks"></div>
 		<h2 id="inbox-title">Inbox</h2>
 		<div id="inbox"></div>
-		<div id="menu-container">
-		</div>
 		<nav>
-			<button rel="inbox">INBOX</button>
-			<button rel="menu" data-menu="options">OPTIONS</button>
-			<button rel="update">UPDATE</button>
-			<div class="menu options">
-				<div class="opt-group cf" name="options">
-					<label>Options</label>
-					<button rel="toggle-notifications">Enable Notifications</button>
-				</div>
-				<div class="opt-group cf" name="styles">
-					<label>Styles</label>
-					<button class="sample-dark" rel="colorscheme" name="dark">DARK</button>
-					<button class="sample-light" rel="colorscheme" name="light">LIGHT</button>
-					<button class="sample-black" rel="colorscheme" name="black">BLACK</button>
-					<button class="sample-night" rel="colorscheme" name="night">NIGHT</button>
+			<div id="menu-container">
+				<div class="menu options">
+					<div class="opt-group cf" name="options">
+						<label>Options</label>
+						<button rel="toggle-notifications">Enable Notifications</button>
+					</div>
+					<div class="opt-group cf" name="styles">
+						<label>Styles</label>
+						<button class="sample-dark" rel="colorscheme" data-value="dark">DARK</button>
+						<button class="sample-light" rel="colorscheme" data-value="light">LIGHT</button>
+						<button class="sample-black" rel="colorscheme" data-value="black">BLACK</button>
+						<button class="sample-night" rel="colorscheme" data-value="night">NIGHT</button>
+					</div>
 				</div>
 			</div>
+			<button rel="inbox">INBOX</button>
+			<button rel="menu" data-value="options">OPTIONS</button>
+			<button rel="update">UPDATE</button>
 		</nav>
 		<div id="context-menu">
 			<div class="option note" rel="status" data-value="note" />## note</div>

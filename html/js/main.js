@@ -181,15 +181,16 @@ TodoController.prototype = {
 				element: $('#schedule'),
 				dayWidth: 480
 			},
-			tick:         { element: null }, // this is generated later
-			todayTitle:   { element: $('#today-title') },
-			calendar:     { element: $('#calendar') },
-			calendarWrap: { element: $('#calendar-wrap') },
-			calendarBody: { element: $('#calendar-body') },
-			tasks:        { element: $('#tasks') },
-			inbox:        { element: $('#inbox') },
-			updateButton: { element: $('nav button[rel=update]') },
-			contextMenu:  { element: $('#context-menu') }
+			tick:          { element: null }, // this is generated later
+			todayTitle:    { element: $('#today-title') },
+			calendar:      { element: $('#calendar') },
+			calendarWrap:  { element: $('#calendar-wrap') },
+			calendarBody:  { element: $('#calendar-body') },
+			tasks:         { element: $('#tasks') },
+			inbox:         { element: $('#inbox') },
+			updateButton:  { element: $('nav button[rel=update]') },
+			contextMenu:   { element: $('#context-menu') },
+			menuContainer: { element: $('#menu-container') }
 		};
 		this.styles = ["dark", "black", "night", "light"];
 		this.ui.punch.data = this.ui.punch.element.html().replace(/<[^>]+>/g, '');
@@ -199,11 +200,8 @@ TodoController.prototype = {
 			"inbox":function() {
 				I.addToInbox();
 			},
-			"load":function() {
+			"update":function() {
 				I.loadUpdated();
-			},
-			"save":function() {
-				I.flushChanges();
 			},
 			"save":function() {
 				I.flushChanges();
@@ -212,8 +210,7 @@ TodoController.prototype = {
 				I.switchStyle(value);
 			},
 			"menu":function(value) {
-				var menu = $("#" + value);
-				menu.data("mousedown", true);
+				var menu = $(".menu." + value);
 				I.toggleMenu(menu);
 			},
 			"notifications":function() {
@@ -225,7 +222,7 @@ TodoController.prototype = {
 			button = $(this);
 			action = button.attr("rel");
 			if (typeof I.buttonActions[action] === "function") {
-				I.buttonActions[action](button.val(), event);
+				I.buttonActions[action](button.attr("data-value"), event);
 			}
 			menu = button.closest(".menu");
 			if (menu.length)
@@ -1048,9 +1045,10 @@ TodoController.prototype = {
 		}
 	},
 	toggleMenu: function(element, override) {
+		this.ui.menuContainer.element.toggleClass("open", override);
 		element
-			.toggleClass('open', override)
-			.siblings().removeClass('open');
+			.toggleClass("open", override)
+			.siblings().removeClass("open");
 	},
 	toggleCalendar: function() {
 		this.ui.calendarWrap.element.toggleClass('open');

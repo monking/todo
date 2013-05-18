@@ -61,7 +61,22 @@ nav button{display:inline-block;vertical-align:middle}
 
 .current-time{background-color:inherit;font-size:250%;padding:0 0.3em;display:block;line-height:45px}
 
-#menu-container{display:none;position:fixed;width:60%;height:100%;left:15%;top:0;overflow:auto;padding:5%}
+#menu-container {
+	display:none;
+	position:fixed;
+	width:60%;
+	height:100%;
+	left:20%;
+	bottom:70px;
+	overflow:auto;
+}
+#menu-container .menu {
+	padding: 5%;
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 90%;
+}
 #menu-container,
 .menu,
 #calendar-wrap,
