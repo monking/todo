@@ -79,6 +79,11 @@ class Todo {
 		$depth,
 		$section;
 
+	/*
+	 * @param array $options [
+	 *   $user BasicUser
+	 *   ]
+	 */
 	public function __construct($options = array()) {
 		if (!isset($options['user']))
 			die('No username given');
@@ -90,12 +95,14 @@ class Todo {
 
 	/**
 	 * see if the given string contains a timezone code, and switch if it does
+	 *
+	 * @param string $line the text to search for a timezone declaration
 	 */
-	static function checkTimezone($string) {
+	static function checkTimezone($line) {
 		/**
 		 * disabled for now: assuming device local time
 		 *
-		$timezone = preg_replace('/^(.*?TZ > ([a-zA-Z\/_]+))?.*$/', '$2', $string);
+		$timezone = preg_replace('/^(.*?TZ > ([a-zA-Z\/_]+))?.*$/', '$2', $line);
 		if ($timezone) {
 			date_default_timezone_set($timezone);
 		}
@@ -104,8 +111,18 @@ class Todo {
 
 	/**
 	 * parse each line, and recurse on indented lines
+	 *
+	 * @param stdClass $parent_object the object on which to add this line as a 
+	 *   child, comment, or however it is parsed. Leave NULL when calling 
+	 *   explicitly.
+	 * @param number $force_depth depth in the data tree, to override apparent 
+	 *   depth based on line indentation.
+	 * @return stdClass if $parent_object is NULL, otherwise void
+	 *
+	 * NOTE: meant to be called recursively, the stack will be as deep as the 
+	 * object.
 	 */
-	private function parseLine(&$parent_object = null, $force_depth = null) { // stack should only be as deep as indent depth
+	private function parseLine(&$parent_object = null, $force_depth = null) {
 		$line = $this->lines[$this->line_num];
 
 		if ($force_depth === null) {
@@ -259,6 +276,8 @@ class Todo {
 
 	/**
 	 * load and parse Vim Outliner formatted data
+	 *
+	 * @return string JSON todo data
 	 */
 	public function loadOTL() {
 		$file_path = $this->user->dir . DS . 'todo.otl';
@@ -288,11 +307,13 @@ class Todo {
 
 	/**
 	 * encode a period of time in text
-	 * @segment stdClass with the following properties
-	 * 	->start int timestamp, NULL assumes 00:00 on the date of ->end
-	 * 	->end int timestamp
-	 * 	->type string name of the segment type, NULL for spaces
-	 * @timezone string name of the timezone
+	 *
+	 * @param stdClass $segment [
+	 *   int $start timestamp, NULL assumes 00:00 on the date of ->end
+	 *   int $end timestamp
+	 *   string $type name of the segment type, NULL for spaces
+	 *   ]
+	 * @param string $timezone Unix-compatible timezone name
 	 */
 	private function textSegment($segment, $timezone = 'America/Los_Angeles') {
 		date_default_timezone_set($timezone);
@@ -317,6 +338,13 @@ class Todo {
 
 	/**
 	 * encode object as OTL document
+	 *
+	 * @param stdClass $object entire todo data tree
+	 * @param string $indent indent to start with
+	 * @return string OTL-encoded text data
+	 *
+	 * NOTE: calls itself recursively on the contents of the `children` 
+	 *   property of $object, if it exists.
 	 */
 	private function encodeOTL($object, $indent = '') {
 		$otl = $indent;
@@ -378,6 +406,8 @@ class Todo {
 
 	/**
 	 * load JSON data
+	 *
+	 * @return string JSON-encoded data, or FALSE if none loaded.
 	 */
 	public function loadJSON() {
 		$file_path = $this->user->dir . '/todo.json';
@@ -399,6 +429,11 @@ class Todo {
 
 	/**
 	 * load data in various formats
+	 *
+	 * @param boolean $force_update if the user has the `use_otl` option set to 
+	 *   TRUE, the text version of the data is interpreted and the JSON file is 
+	 *   updated
+	 * @return string JSON-encoded data, or FALSE if none loaded.
 	 */
 	public function load($force_update = false) {
 		$file_path = $this->user->dir . '/todo.json';
@@ -411,6 +446,8 @@ class Todo {
 
 	/**
 	 * add directly to OTL inbox
+	 *
+	 * @param string $task new line to add to the inbox
 	 */
 	public function addToInboxOTL($task) {
 		$todo_file = fopen($this->user->dir . '/todo.otl', 'a');

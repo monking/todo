@@ -393,8 +393,8 @@ TodoController.prototype = {
 				$.ajax({
 					url: 'api.php?action=json' + (options.disk ? '&f' : ''),
 					dataType: 'json',
-					success: function(data) {
-						parseTodo(data);
+					success: function(response) {
+						parseTodo(response.data);
 					},
 					complete: function() {
 						setFetched('todo');
@@ -417,12 +417,12 @@ TodoController.prototype = {
 			setFetched('punch');
 		} else {
 			$.ajax({
-				url: 'api.php?action=punch',
-				success: function(data) {
-					parsePunch(data);
+				url: "api.php?action=punch",
+				success: function(response) {
+					parsePunch(response.data);
 				},
 				complete: function() {
-					setFetched('punch');
+					setFetched("punch");
 				}
 			});
 		}
