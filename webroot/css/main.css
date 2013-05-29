@@ -26,13 +26,16 @@ body,
 }
 .opt-group label { display: block; }
 /* *{;-webkit-text-size-adjust:none} /* TODO: fix text scaling on iPhone more specifically */
-.collapsed{position:relative}
-.collapsed.has-comment{padding-left:2em}
-.collapsed > .comment{position:absolute;top:0.2em;left:0;overflow:hidden;width:1.5em;height:1.5em;cursor:pointer;margin:0;padding:0}
+
+/* make the comment block a little button, and swap it for a pseudo element when open */
+.project, .task{position:relative}
+.has-comment > .title {padding-left:2em}
+.comment:before {position:absolute;top:0;left:0;width:1.5em;height:100%;content:" "}
+.collapsed > .comment{position:absolute;top:0;left:0;overflow:hidden;width:1.5em;height:1.7em;cursor:pointer;margin:0;padding:0}
 .collapsed > .comment:before {
+	position: static;
 	display: block;
 	height: 100%;
-	content: " ";
 }
 .tag{cursor:pointer}
 
@@ -53,13 +56,15 @@ body,
 
 .task{margin-left:2em;cursor:default}
 .task .title {line-height: 2em;}
+.task .title:hover {box-shadow:0 0 5px #39F}
 .urgent{font-weight:bold;font-style:italic;-webkit-animation: pulsate 1s ease-out;-webkit-animation-iteration-count: infinite;opacity: 0.8}
 @-webkit-keyframes pulsate {
     0% {opacity: 0.8}
     50% {opacity: 1.0}
     100% {opacity: 0.8}
 }
-.comment{text-indent:0;margin:0.5em 0;cursor:pointer}
+.canceled .tag {color: inherit !important;}
+.comment{padding-left:1.5em;text-indent:0;margin:0.5em 0;cursor:pointer}
 
 button{text-decoration:none;border:0px;padding:1em 0.3em;margin:0 0.2em;border-radius:0.5em;font-size:140%;cursor:pointer;border:3px solid;text-align:center}
 .disabled{opacity:0.3}
@@ -141,7 +146,9 @@ nav button{display:inline-block;vertical-align:middle}
 body.dark{background-color:#222;color:#FFF}
 .dark a{color:#F9F}
 .dark .project{color:#CBA}
+.dark .comment:before,
 .dark .comment{background-color:#345;color:#CCC}
+.dark .collapsed .comment:before,
 .dark .collapsed .comment{background-color:#468}
 .dark .tag{color:#CA7}
 .dark .tag.highlight{background-color:#FD9;color:#000;outline:2px solid #FD9}
@@ -192,7 +199,9 @@ body.dark{background-color:#222;color:#FFF}
 body.light{background-color:#EEE;color:#222}
 .light a{text-decoration:underline}
 .light .project{}
+.light .comment:before,
 .light .comment{}
+.light .collapsed .comment:before,
 .light .collapsed .comment{outline: 1ps solid #000}
 .light .tag{color:#C60}
 .light .tag.highlight{background-color:#FD9;color:#000;outline:2px solid #FD9}
@@ -241,7 +250,9 @@ body.light{background-color:#EEE;color:#222}
 body.black{background-color:#000;color:#FFF}
 .black a{color:#F9F}
 .black .project{color:#CBA}
+.black .comment:before,
 .black .comment{background-color:#345;color:#CCC}
+.black .collapsed .comment:before,
 .black .collapsed .comment{background-color:#468}
 .black .tag{color:#CA7}
 .black .tag.highlight{background-color:#FD9;color:#000;outline:2px solid #FD9}
@@ -288,7 +299,9 @@ body.black{background-color:#000;color:#FFF}
 body.night{background-color:#200;color:#C00}
 .night a{color:#F00}
 .night .project{color:#900}
+.night .comment:before,
 .night .comment{background-color:#300;color:#C00}
+.night .collapsed .comment:before,
 .night .collapsed .comment{background-color:#900}
 .night .tag{color:#F00}
 .night .tag.highlight{background-color:#E00;color:#000;outline:2px solid #E00}
