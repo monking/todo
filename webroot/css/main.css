@@ -27,7 +27,8 @@ body,
 .opt-group label { display: block; }
 /* *{;-webkit-text-size-adjust:none} /* TODO: fix text scaling on iPhone more specifically */
 .collapsed{position:relative}
-.collapsed > .comment{position:absolute;top:0.2em;left:-2em;overflow:hidden;width:1.5em;height:1.5em;cursor:pointer;margin:0;padding:0}
+.collapsed.has-comment{padding-left:2em}
+.collapsed > .comment{position:absolute;top:0.2em;left:0;overflow:hidden;width:1.5em;height:1.5em;cursor:pointer;margin:0;padding:0}
 .collapsed > .comment:before {
 	display: block;
 	height: 100%;
@@ -50,7 +51,7 @@ body,
 .event .name{padding-left:0.5em}
 .event .name .remind{margin-right:0.5em}
 
-.task{margin-left:2em;padding-left:2em;text-indent:-2em;cursor:default}
+.task{margin-left:2em;cursor:default}
 .task .title {line-height: 2em;}
 .urgent{font-weight:bold;font-style:italic;-webkit-animation: pulsate 1s ease-out;-webkit-animation-iteration-count: infinite;opacity: 0.8}
 @-webkit-keyframes pulsate {

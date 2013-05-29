@@ -645,7 +645,7 @@ TodoController.prototype = {
 			markup += '<div class="tasks">'
 			for (i = 0; i < day.children.length; i++) {
 				var project = day.children[i];
-				markup += '<div class="project collapsed">'
+				markup += '<div class="project collapsed' + (typeof project.comment !== "undefined" ? " has-comment" : "") + '">'
 					+ '<div class="title">' + this.markupTags(project.name) + '</div>';
 				if (project.hasOwnProperty('comment')) {
 					markup += '<pre class="comment">'
@@ -666,7 +666,7 @@ TodoController.prototype = {
 	},
 	markupTask: function(task) {
 		var markup = '';
-		markup += '<div class="task collapsed ' + task.status + '" data-key="' + task.tmpKey + '">'
+		markup += '<div class="task collapsed ' + task.status + (typeof task.comment !== "undefined" ? " has-comment" : "") + '" data-key="' + task.tmpKey + '">'
 			+ '<div class="title">' + this.markupTags(task.name) + '</div>';
 		if (task.hasOwnProperty('comment')) {
 			markup += '<pre class="comment">'
