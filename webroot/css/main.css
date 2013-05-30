@@ -56,7 +56,7 @@ body,
 
 .task{margin-left:2em;cursor:default}
 .task .title {line-height: 2em;}
-.task .title:hover {box-shadow:0 0 5px #39F}
+.task .title:hover {box-shadow:0 0 5px #39F; position:relative;z-index: 1}
 .urgent{font-weight:bold;font-style:italic;-webkit-animation: pulsate 1s ease-out;-webkit-animation-iteration-count: infinite;opacity: 0.8}
 @-webkit-keyframes pulsate {
     0% {opacity: 0.8}
