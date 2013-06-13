@@ -496,41 +496,48 @@ TodoController.prototype = {
 		if (day.hasOwnProperty('schedule')) {
 			for (i = 0; i < day.schedule.length; i++) {
 				event = day.schedule[i];
-
-				eventEnd = event.children[event.children.length - 1].end;
-				left = this.secondsToPixels(event.start - todayTime);
-				classes = ["event"];
-				markup += '<div class="event" start="' + event.start + '" end="' + eventEnd + '" style="'
-						+ 'margin-left:' + left + 'px;'
-					+ '">';
-				for (j = 0; j < event.children.length; j++) {
-					segment = event.children[j];
-					duration = segment.end - segment.start;
-					left = this.secondsToPixels(segment.start - event.start);
-					width = this.secondsToPixels(duration);
-					durationFormatted = (duration < 3600?
-						Math.floor(duration / 60) + " min.":
-						Math.floor(duration / 3600) + " hrs."
-					);
-					markup += '<div class="segment ' + segment.type + '" title="' + durationFormatted + '"'
-						+ ' style="left:' + left + 'px;width:' + width + 'px"'
-						+ ' start="' + segment.start + '" end="' + segment.end + '"><div class="remaining"></div></div>'
-				}
-				nameLeft = this.secondsToPixels(eventEnd - event.start);
-				markup += '<div class="name" style="left:' + nameLeft + 'px">';
-				if (typeof event.remind !== "undefined") {
-					reminderTooltip = "";
-					for (k = 0; k < event.remind.length; k++) {
-						if (k) reminderTooltip += ", ";
-						reminderTooltip += Math.ceil(event.remind[k] / 60);
+				if (typeof event.type !== "undefined" && event.type === "divider") {
+					if (event.name) {
+						markup += '<div class="divider"><label>' + event.name + '</label></div>';
+					} else {
+						markup += '<div class="divider empty"></div>';
 					}
-					reminderTooltip += " min.";
-					markup += '<div class="icon remind" title="' + reminderTooltip + '"></div>';
+				} else {
+					eventEnd = event.children[event.children.length - 1].end;
+					left = this.secondsToPixels(event.start - todayTime);
+					classes = ["event"];
+					markup += '<div class="event" start="' + event.start + '" end="' + eventEnd + '" style="'
+							+ 'margin-left:' + left + 'px;'
+						+ '">';
+					for (j = 0; j < event.children.length; j++) {
+						segment = event.children[j];
+						duration = segment.end - segment.start;
+						left = this.secondsToPixels(segment.start - event.start);
+						width = this.secondsToPixels(duration);
+						durationFormatted = (duration < 3600?
+							Math.floor(duration / 60) + " min.":
+							Math.floor(duration / 3600) + " hrs."
+						);
+						markup += '<div class="segment ' + segment.type + '" title="' + durationFormatted + '"'
+							+ ' style="left:' + left + 'px;width:' + width + 'px"'
+							+ ' start="' + segment.start + '" end="' + segment.end + '"><div class="remaining"></div></div>'
+					}
+					nameLeft = this.secondsToPixels(eventEnd - event.start);
+					markup += '<div class="name" style="left:' + nameLeft + 'px">';
+					if (typeof event.remind !== "undefined") {
+						reminderTooltip = "";
+						for (k = 0; k < event.remind.length; k++) {
+							if (k) reminderTooltip += ", ";
+							reminderTooltip += Math.ceil(event.remind[k] / 60);
+						}
+						reminderTooltip += " min.";
+						markup += '<div class="icon remind" title="' + reminderTooltip + '"></div>';
+					}
+					markup += this.formatTime(new Date(event.start * 1000)) + ' '
+								+ this.markupTags(event.name)
+							+ '</div>'
+						+ '</div>';
 				}
-				markup += this.formatTime(new Date(event.start * 1000)) + ' '
-							+ this.markupTags(event.name)
-						+ '</div>'
-					+ '</div>';
 			}
 		}
 

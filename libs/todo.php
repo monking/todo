@@ -156,81 +156,88 @@ class Todo {
 				return $content;
 			} else {
 				if ($parent_object->type == 'date') { // comment on a date is a schedule
-                    if (substr($content, 0, 1) === '_') return // this is the schedule ruler, ignore
+					if (substr($content, 0, 1) === '_') { // this is the schedule ruler, ignore
+						return;
+					} else if (substr($content, 0, 1) === '-') { // this is a divider in the schedule
+						$parent_object->schedule[] = (object) array(
+							'type' => 'divider',
+							'name' => preg_replace('/^-+\s*|\s*-+$/', '', $content)
+						);
+					} else {
+						$content = substr($content, 1); // trim leading space from comment
 
-					$content = substr($content, 1);
-
-					$event = (object) array(// TODO: parse this data with ~1 RegExp pattern
-						'name' => preg_replace('/^.*?[x\~>?\| -]*(\d\d:?\d\d)?/', '', $content),
-						'start' => preg_replace('/^(.*? ((\d\d):?(\d\d)))?.*$/', '$3$4', $content),
-						'contains' => 'segment', // TODO: $hierarchies contains this type, but the structure is not linear, not using it yet
-                        'children' => array(),
-					);
-					if ($event->start) {
-						self::checkTimezone($content);
-						$event->start = date_timestamp_get(DateTime::createFromFormat('Y-m-d Hi', $parent_object->date . ' ' . $event->start));
-					}
-					preg_match('/ +!\[?([0-9,]+)/', $event->name, $reminders);
-					if ($reminders) {
-						$event->name = preg_replace('/ +!\d+(,\d+)*/', '', $event->name);
-						$reminders = explode(',', $reminders[1]);
-						$event->remind = array();
-						foreach($reminders as $reminder) {
-							$event->remind[] = intval($reminder) * 60;
+						$event = (object) array(// TODO: parse this data with ~1 RegExp pattern
+							'name' => preg_replace('/^.*?[x\~>?\| -]*(\d\d:?\d\d)?/', '', $content),
+							'start' => preg_replace('/^(.*? ((\d\d):?(\d\d)))?.*$/', '$3$4', $content),
+							'contains' => 'segment', // TODO: $hierarchies contains this type, but the structure is not linear, not using it yet
+							'children' => array(),
+						);
+						if ($event->start) {
+							self::checkTimezone($content);
+							$event->start = date_timestamp_get(DateTime::createFromFormat('Y-m-d Hi', $parent_object->date . ' ' . $event->start));
 						}
-					}
-                    preg_match('/^.*?[|x\~>?][|x\~>? -]*/', $content, $segments);
-                    if ($segments) {
-                        $segments = substr($segments[0], 1); // drop leading space in formatting
-
-                        // parse segment durations
-						$start_types = array('|', '?', '~');
-						$start_type_index = 0;
-						$start_offset = false;
-						foreach ($start_types as $type) {
-                            $start_offset = strpos($segments, $type);
-							if ($start_offset !== false) break;
-						}
-						if ($start_offset === false) return; // no start time, don't parse this line
-
-                        if (!$event->start) {
-							$event->start = $parent_object->time + ($start_offset / 2) * 3600;
-						}
-                        $prev_type = null;
-                        for ($step = 0; $step <= strlen($segments); $step++) {
-							if ($step == strlen($segments)) {
-								$type = null;
-							} else if ('-' === substr($segments, $step, 1)) {
-								$type = $type = $prev_type;
-							} else {
-								$type = @self::$event_key[substr($segments, $step, 1)];
+						preg_match('/ +!\[?([0-9,]+)/', $event->name, $reminders);
+						if ($reminders) {
+							$event->name = preg_replace('/ +!\d+(,\d+)*/', '', $event->name);
+							$reminders = explode(',', $reminders[1]);
+							$event->remind = array();
+							foreach($reminders as $reminder) {
+								$event->remind[] = intval($reminder) * 60;
 							}
-                            if ($type !== $prev_type) {
-								$step_time = $event->start + ($step - $start_offset) / 2 * 3600;
-                                if ($prev_type && !empty($event->children)) {
-                                    $event->children[count($event->children) - 1]->end = $step_time;
-                                }
-                                if ($type) {
-									if ($event->start && $step == $start_offset)
-										$step_time = $event->start;
-                                    if (empty($event->children))
-                                        $event->children = array();
-                                    $event->children[] = (object) array(
-                                        'start' => $step_time,
-                                        'end' => $step_time,
-                                        'type' => $type,
-                                   );
-                                }
-                            }
-                            $prev_type = $type;
-                        }
-
-                        // add event to schedule
-						if (!isset($parent_object->schedule)) {
-							$parent_object->schedule = array();
 						}
-						$parent_object->schedule[] = $event;
-                    }
+						preg_match('/^.*?[|x\~>?][|x\~>? -]*/', $content, $segments);
+						if ($segments) {
+							$segments = substr($segments[0], 1); // drop leading space in formatting
+
+							// parse segment durations
+							$start_types = array('|', '?', '~');
+							$start_type_index = 0;
+							$start_offset = false;
+							foreach ($start_types as $type) {
+								$start_offset = strpos($segments, $type);
+								if ($start_offset !== false) break;
+							}
+							if ($start_offset === false) return; // no start time, don't parse this line
+
+							if (!$event->start) {
+								$event->start = $parent_object->time + ($start_offset / 2) * 3600;
+							}
+							$prev_type = null;
+							for ($step = 0; $step <= strlen($segments); $step++) {
+								if ($step == strlen($segments)) {
+									$type = null;
+								} else if ('-' === substr($segments, $step, 1)) {
+									$type = $type = $prev_type;
+								} else {
+									$type = @self::$event_key[substr($segments, $step, 1)];
+								}
+								if ($type !== $prev_type) {
+									$step_time = $event->start + ($step - $start_offset) / 2 * 3600;
+									if ($prev_type && !empty($event->children)) {
+										$event->children[count($event->children) - 1]->end = $step_time;
+									}
+									if ($type) {
+										if ($event->start && $step == $start_offset)
+											$step_time = $event->start;
+										if (empty($event->children))
+											$event->children = array();
+										$event->children[] = (object) array(
+											'start' => $step_time,
+											'end' => $step_time,
+											'type' => $type,
+									   );
+									}
+								}
+								$prev_type = $type;
+							}
+
+							// add event to schedule
+							if (!isset($parent_object->schedule)) {
+								$parent_object->schedule = array();
+							}
+							$parent_object->schedule[] = $event;
+						}
+					}
 				} else {
 					if (!isset($parent_object->comment)) {
 						$parent_object->comment = $content;
