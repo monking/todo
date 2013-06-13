@@ -164,7 +164,7 @@ class Todo {
 							'name' => preg_replace('/^-+\s*|\s*-+$/', '', $content)
 						);
 					} else {
-						$content = substr($content, 1); // trim leading space from comment
+						// $content = substr($content, 1); // trim leading space from comment
 
 						$event = (object) array(// TODO: parse this data with ~1 RegExp pattern
 							'name' => preg_replace('/^.*?[x\~>?\| -]*(\d\d:?\d\d)?/', '', $content),
