@@ -69,6 +69,7 @@ require_once('../config.php');
 			<button rel="menu" data-value="options">OPTIONS</button>
 			<button rel="update">UPDATE</button>
 		</nav>
+<!--
 		<div id="context-menu">
 			<div class="option note" rel="status" data-value="note" />## note</div>
 			<div class="option canceled" rel="status" data-value="canceled" />xx canceled</div>
@@ -81,5 +82,6 @@ require_once('../config.php');
 			<div class="option urgent" rel="status" data-value="urgent" />!! urgent</div>
 			<div class="option question" rel="status" data-value="question" />?? question</div>
 		</div>
+-->
 	</body>
 </html>
