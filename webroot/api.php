@@ -56,6 +56,11 @@ case 'save':
 	$todo->saveOTL();
 	echo json_encode(array('status' => 'ok'));
 	exit();
+case 'save_otl':
+	$todo->loadJSON();
+	$todo->saveOTL();
+	echo json_encode(array('status' => 'ok'));
+	exit();
 case 'json':
 	$force_update = isset($_GET['f']);
 	$todo->load($force_update);

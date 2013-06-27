@@ -44,6 +44,7 @@ class Todo {
 		'__' => 'normal',
 		'==' => 'next',
 		'>>' => 'now',
+		'~~' => 'background',
 		'::' => 'paused',
 		'//' => 'done',
 		'..' => 'hold',
@@ -167,8 +168,8 @@ class Todo {
 						// $content = substr($content, 1); // trim leading space from comment
 
 						$event = (object) array(// TODO: parse this data with ~1 RegExp pattern
-							'name' => preg_replace('/^.*?[x\~>?\| -]*(\d\d:?\d\d)?/', '', $content),
-							'start' => preg_replace('/^(.*? ((\d\d):?(\d\d)))?.*$/', '$3$4', $content),
+							'name' => preg_replace('/^.*?[x\~>?\| -]*(\d\d:?\d\d )?/', '', $content),
+							'start' => preg_replace('/^(.*? ((\d\d):?(\d\d) ))?.*$/', '$3$4', $content),
 							'contains' => 'segment', // TODO: $hierarchies contains this type, but the structure is not linear, not using it yet
 							'children' => array(),
 						);
@@ -356,7 +357,7 @@ class Todo {
 	private function encodeOTL($object, $indent = '') {
 		$otl = $indent;
 		if (isset($object->status)) {
-			$otl .= self::$status_codes[$object->status];
+			$otl .= self::$status_codes[$object->status] . ' ';
 		}
 		if (isset($object->name)) {
 			$otl .= $object->name;
@@ -365,32 +366,37 @@ class Todo {
 		if (isset($object->schedule)) {
 			$otl .= $indent . '|_| . . : . . | . . : . . | . . : . . | . . : . . | . . : . .' . "\n";
 			foreach ($object->schedule as $event) {
-				$otl .= $indent . '| ';
+				$otl .= $indent . '|';
 				$last_end_time = NULL;
-				foreach ($event->children as $segment) {
-					if ($segment->start !== $last_end_time) {
-						$otl .= $this->textSegment((object) array(
-							'start' => $last_end_time,
-							'end' => $segment->start,
-							'type' => NULL
-						));
+				if (isset($event->type) && $event->type == 'divider') {
+					$otl .= '- ' . $event->name;
+				} else {
+					$otl .= ' ';
+					foreach ($event->children as $segment) {
+						if ($segment->start !== $last_end_time) {
+							$otl .= $this->textSegment((object) array(
+								'start' => $last_end_time,
+								'end' => $segment->start,
+								'type' => NULL
+							));
+						}
+						$last_end_time = $segment->end;
+						$otl .= $this->textSegment($segment);
 					}
-					$last_end_time = $segment->end;
-					$otl .= $this->textSegment($segment);
-				}
-				$otl .= ' ' . date('H:i', $event->start) . ' ' . $event->name;
-				if (isset($event->remind)) {
-					$reminders = array();
-					foreach ($event->remind as $seconds) {
-						$reminders[] = intval($seconds / 60);
+					$otl .= ' ' . date('H:i', $event->start) . ' ' . $event->name;
+					if (isset($event->remind)) {
+						$reminders = array();
+						foreach ($event->remind as $seconds) {
+							$reminders[] = intval($seconds / 60);
+						}
+						$otl .= '  !' . implode(',', $reminders);
 					}
-					$otl .= '  !' . implode(',', $reminders);
 				}
 				$otl .= "\n";
 			}
 		}
 		if (isset($object->comment)) {
-			$otl .= $indent . '|' . preg_replace('/\n/m', "\n$indent|", $object->comment);
+			$otl .= $indent . '| ' . preg_replace('/\n/m', "\n$indent|", $object->comment);
 			$otl .= "\n";
 		}
 		if (isset($object->children)) { foreach ($object->children as $object) {
