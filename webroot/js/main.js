@@ -320,15 +320,19 @@ TodoController.prototype = {
 			32:  /* SPACE */ 'addToInbox',
 			37:  /* LEFT  */ 'reverseDay',
 			39:  /* RIGHT */ 'advanceDay',
+			48:  /* 1     */ 'focusNone',
+			49:  /* 1     */ 'focusNow',
+			50:  /* 1     */ 'focusNext',
+			51:  /* 1     */ 'focusNormal',
 			67:  /* c     */ 'toggleCalendar',
 			72:  /* h     */ 'reverseDay',
 			73:  /* i     */ 'toggleInbox',
 			74:  /* j     */ 'advanceMonth',
 			75:  /* k     */ 'reverseMonth',
 			76:  /* l     */ 'advanceDay',
-			78:  /* n     */ 'focusNow',
 			84:  /* t     */ 'gotoToday',
-			85:  /* u     */ 'loadUpdated'
+			85:  /* u     */ 'loadUpdated',
+			192: /* `     */ 'unfocusTasks'
 		};
 		$(document.body).keydown(function(event) {
 			console.log(event.keyCode);
@@ -968,15 +972,39 @@ TodoController.prototype = {
 			}
 		}
 	},
+	focusTasks: function(level) {
+		var tiers, selector;
+		if (typeof level === "undefined") level = 1;
+		if (level) {
+			tiers = [".task.now", ".task.next", ".task.normal"];
+			selector = tiers.slice(0, level).join(", ");
+			$(".project").each(function() {
+				if ($(this).find(selector).length) {
+					$(this).removeClass("collapsed");
+				} else {
+					$(this).addClass("collapsed");
+				}
+			});
+		} else if (level === 0) {
+			$(".project").addClass("collapsed");
+		} else {
+			$(".project").removeClass("collapsed");
+		}
+	},
+	focusNone: function() {
+		this.focusTasks(0);
+	},
 	focusNow: function() {
-		this.gotoToday();
-		$(".project").each(function() {
-			if ($(this).find(".task.now").length) {
-				$(this).removeClass("collapsed");
-			} else {
-				$(this).addClass("collapsed");
-			}
-		});
+		this.focusTasks(1);
+	},
+	focusNext: function() {
+		this.focusTasks(2);
+	},
+	focusNormal: function() {
+		this.focusTasks(3);
+	},
+	unfocusTasks: function() {
+		this.focusTasks(null);
 	},
 	updateSchedule: function() {
 		var I, docTimezoneOffset, today, i, j, now, $segments, start,
