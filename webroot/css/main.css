@@ -31,6 +31,9 @@ body,
 .comment{padding:0.5em 0 0.5em 1.5em;text-indent:0;margin:0.5em 0;cursor:pointer}
 .has-comment > .title {padding-left:2em}
 .comment:before {position:absolute;top:0;left:0;width:1.5em;height:100%;content:" "}
+.project.collapsed .task {
+	display: none;
+}
 .collapsed > .comment{position:absolute;top:0.2em;left:0;overflow:hidden;width:1.5em;height:1.5em;cursor:pointer;margin:0;padding:0}
 .collapsed > .comment:before {
 	position: static;
@@ -59,7 +62,9 @@ body,
 
 .task{margin-left:2em;cursor:default}
 .task .title {line-height: 2em;}
-.task .title:hover {box-shadow:0 0 5px #39F; position:relative;z-index: 1}
+/* FIXME: this interrupts pointer-events on the comment, for some reason
+ * .task .title:hover {box-shadow:0 0 5px #39F; position:relative;z-index: 1}
+ */
 .urgent{font-weight:bold;font-style:italic;-webkit-animation: pulsate 1s ease-out;-webkit-animation-iteration-count: infinite;opacity: 0.8}
 @-webkit-keyframes pulsate {
     0% {opacity: 0.8}

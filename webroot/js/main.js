@@ -652,7 +652,7 @@ TodoController.prototype = {
 			markup += '<div class="tasks">'
 			for (i = 0; i < day.children.length; i++) {
 				var project = day.children[i];
-				markup += '<div class="project collapsed' + (typeof project.comment !== "undefined" ? " has-comment" : "") + '">'
+				markup += '<div class="project' + (typeof project.comment !== "undefined" ? " has-comment" : "") + '">'
 					+ '<div class="title">' + this.markupTags(project.name) + '</div>';
 				if (project.hasOwnProperty('comment')) {
 					markup += '<pre class="comment">'
@@ -809,6 +809,9 @@ TodoController.prototype = {
 			});
 		});
 		$(".comment").click(function() {
+			$(this).parent().toggleClass("collapsed");
+		});
+		$(".project > .title").click(function() {
 			$(this).parent().toggleClass("collapsed");
 		});
 	},
