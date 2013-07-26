@@ -326,6 +326,7 @@ TodoController.prototype = {
 			74:  /* j     */ 'advanceMonth',
 			75:  /* k     */ 'reverseMonth',
 			76:  /* l     */ 'advanceDay',
+			78:  /* n     */ 'focusNow',
 			84:  /* t     */ 'gotoToday',
 			85:  /* u     */ 'loadUpdated'
 		};
@@ -966,6 +967,16 @@ TodoController.prototype = {
 				day = periods[i][j];
 			}
 		}
+	},
+	focusNow: function() {
+		this.gotoToday();
+		$(".project").each(function() {
+			if ($(this).find(".task.now").length) {
+				$(this).removeClass("collapsed");
+			} else {
+				$(this).addClass("collapsed");
+			}
+		});
 	},
 	updateSchedule: function() {
 		var I, docTimezoneOffset, today, i, j, now, $segments, start,
