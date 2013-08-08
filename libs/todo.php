@@ -177,10 +177,10 @@ class Todo {
 							self::checkTimezone($content);
 							$event->start = date_timestamp_get(DateTime::createFromFormat('Y-m-d Hi', $parent_object->date . ' ' . $event->start));
 						}
-						preg_match('/ +!\[?([0-9,]+)/', $event->name, $reminders);
+						preg_match('/( +|^)!([0-9,]+)/', $event->name, $reminders);
 						if ($reminders) {
-							$event->name = preg_replace('/ +!\d+(,\d+)*/', '', $event->name);
-							$reminders = explode(',', $reminders[1]);
+							$event->name = preg_replace('/( +|^)!([0-9,]+)/', '', $event->name);
+							$reminders = explode(',', $reminders[2]);
 							$event->remind = array();
 							foreach($reminders as $reminder) {
 								$event->remind[] = intval($reminder) * 60;
