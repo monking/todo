@@ -26,7 +26,6 @@ case 'punch':
 	$data = file($last_file);
 	$latest = $data[count($data) - 1];
 	$latest = explode('", "', substr($latest, 1, strlen($latest) - 3));
-	// heavenspot -- coachella_acct   oauth2 r/d   14:44 (0:36)
 	$time = preg_replace('/.*?(\d+:\d\d):\d\d.*/', '$1', $latest[1]);
 	exit(json_encode(array(
 		'status' => 'ok',

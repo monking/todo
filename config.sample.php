@@ -18,7 +18,8 @@ $user = new BasicUser(array(
 	'credentials_path' => constant('APPROOT') . DS . 'credentials.json',
 	'user_dir' => constant('APPROOT') . DS . 'users',
 	'user_default_settings' => array(
-		'use_otl' => false
+		'use_otl' => false,
+		'use_punch' => false
 	),
 ));
 if (isset($_GET['logout'])) {

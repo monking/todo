@@ -289,8 +289,9 @@ class Todo {
 	 */
 	public function loadOTL() {
 		$file_path = $this->user->dir . DS . 'todo.otl';
-		if (!file_exists($file_path))
+		if (!file_exists($file_path)) {
 			return false;
+		}
 		$otl = file_get_contents($file_path);
 
 		$this->lines = explode("\n", $otl);
@@ -310,7 +311,7 @@ class Todo {
 			$this->parseLine($this->data);
 		}
 		$this->lines = null;
-		return json_encode($this->data);
+		return $this->data;
 	}
 
 	/**
@@ -427,7 +428,7 @@ class Todo {
 		if (file_exists($file_path)) {
 			$json = file_get_contents($file_path);
 			$this->data = json_decode($json);
-			return $json;
+			return $this->data;
 		}
 		return false;
 	}

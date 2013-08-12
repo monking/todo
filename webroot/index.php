@@ -22,6 +22,7 @@ require_once('../config.php');
 		<link type="text/css" rel="stylesheet" href="css/main.css" />
 		<script type="text/javascript" src="js/vendor/jquery-2.0.0.min.js"></script>
 		<!-- <script type="text/javascript" src="//code.jquery.com/mobile/1.3.1/jquery.mobile-1.3.1.js"></script> -->
+		<script>var TodoUserSettings = <?php echo json_encode($user->settings); ?></script>
 		<script type="text/javascript" src="js/main.js"></script>
 	</head>
 	<body class="dark">

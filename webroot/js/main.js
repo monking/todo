@@ -355,9 +355,11 @@ TodoController.prototype = {
 		});
 
 		var fetched = {
-			todo: false,
-			punch: false
+			todo: false
 		};
+		if (typeof TodoUserSettings !== "undefined" && TodoUserSettings.use_punch) {
+			fetched.punch = false;
+		}
 		var setFetched = function(name) {
 			fetched[name] = true;
 			for (key in fetched) {
@@ -411,25 +413,27 @@ TodoController.prototype = {
 		}
 
 		// fetch punch data
-		var parsePunch = function(data) {
-			if (window.localStorage) {
-				window.localStorage.punch = data;
-			}
-			I.ui.punch.data = data;
-		};
-		if (window.localStorage && window.localStorage.punch && !options.disk) {
-			parsePunch(window.localStorage.punch);
-			setFetched('punch');
-		} else {
-			$.ajax({
-				url: "api.php?action=punch",
-				success: function(response) {
-					parsePunch(response.data);
-				},
-				complete: function() {
-					setFetched("punch");
+		if (typeof TodoUserSettings !== "undefined" && TodoUserSettings.use_punch) {
+			var parsePunch = function(data) {
+				if (window.localStorage) {
+					window.localStorage.punch = data;
 				}
-			});
+				I.ui.punch.data = data;
+			};
+			if (window.localStorage && window.localStorage.punch && !options.disk) {
+				parsePunch(window.localStorage.punch);
+				setFetched('punch');
+			} else {
+				$.ajax({
+					url: "api.php?action=punch",
+					success: function(response) {
+						parsePunch(response.data);
+					},
+					complete: function() {
+						setFetched("punch");
+					}
+				});
+			}
 		}
 	},
 	loadUpdated: function() {
